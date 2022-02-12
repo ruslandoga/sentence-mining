@@ -1,0 +1,14 @@
+defmodule M.Repo.Migrations.AddWords do
+  use Ecto.Migration
+
+  def change do
+    create table(:words, primary_key: false) do
+      add :user_id, :integer, null: false, primary_key: true
+      add :word, :text, null: false, primary_key: true
+      add :info, :json, null: false
+      timestamps()
+    end
+
+    # TODO index on updated_at?
+  end
+end
