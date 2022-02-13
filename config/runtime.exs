@@ -7,24 +7,20 @@ import Config
 # any compile-time configuration in here, as it won't be applied.
 # The block below contains prod specific runtime configuration.
 
-if System.get_env("PHX_SERVER") && System.get_env("RELEASE_NAME") do
+config :logger, :console, format: "$time $metadata[$level] $message\n"
+
+if System.get_env("WEB_SERVER") || System.get_env("RELEASE_NAME") do
   config :m, MWeb.Endpoint, server: true
 end
 
 if config_env() == :prod do
+  config :logger, level: :info
   config :m, M.Bot, token: System.fetch_env!("TG_BOT_KEY")
+  config :m, M.Repo, database: "m_prod.db"
 
-  config :m, M.Repo,
-    database: "m_prod.db",
-    show_sensitive_data_on_connection_error: true
-
-  secret_key_base = System.fetch_env!("SECRET_KEY_BASE")
-
-  host = System.get_env("PHX_HOST") || "example.com"
   port = String.to_integer(System.get_env("PORT") || "4000")
 
   config :m, MWeb.Endpoint,
-    url: [host: host, port: 443],
     http: [
       # Enable IPv6 and bind on all interfaces.
       # Set it to  {0, 0, 0, 0, 0, 0, 0, 1} for local network only access.
@@ -32,14 +28,21 @@ if config_env() == :prod do
       # for details about using IPv6 vs IPv4 and loopback vs public addresses.
       ip: {0, 0, 0, 0, 0, 0, 0, 0},
       port: port
-    ],
-    secret_key_base: secret_key_base
+    ]
 end
 
 if config_env() == :dev do
+  config :logger, :console, format: "[$level] $message\n"
   config :m, M.Bot, token: System.fetch_env!("TG_BOT_KEY")
+  config :m, MWeb.Endpoint, http: [ip: {127, 0, 0, 1}, port: 4000]
 
   config :m, M.Repo,
     database: "m_dev.db",
     show_sensitive_data_on_connection_error: true
+end
+
+if config_env() == :test do
+  config :logger, level: :warn
+  config :m, M.Repo, database: :memory
+  config :m, MWeb.Endpoint, http: [ip: {127, 0, 0, 1}, port: 4002]
 end

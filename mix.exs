@@ -7,7 +7,6 @@ defmodule M.MixProject do
       version: "0.1.0",
       elixir: "~> 1.13",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
@@ -38,16 +37,12 @@ defmodule M.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.6.5"},
-      {:phoenix_ecto, "~> 4.4"},
       {:ecto_sqlite3, "~> 0.7.3"},
       {:floki, ">= 0.30.0"},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
-      {:gettext, "~> 0.18"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
-      {:mime, "~> 2.0", override: true},
       {:finch, "~> 0.10"},
       {:nimble_csv, "~> 1.2"}
     ]
@@ -69,6 +64,6 @@ defmodule M.MixProject do
   end
 
   defp releases do
-    [t: [include_executables_for: [:unix]]]
+    [m: [include_executables_for: [:unix]]]
   end
 end

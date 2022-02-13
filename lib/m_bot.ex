@@ -78,7 +78,7 @@ defmodule M.Bot do
   defp handle_text(word, %{chat_id: chat_id, from_id: from_id, message_id: _message_id}) do
     word_info = Sentences.get_sentences(word)
     {:ok, _word} = Sentences.save_word_info(from_id, word, word_info)
-    csv = Sentences.dump_to_csv(word, word_info)
+    # csv = Sentences.dump_to_csv(word, word_info)
     post_message(chat_id, "added #{word}")
   end
 end

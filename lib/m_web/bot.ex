@@ -1,11 +1,12 @@
 defmodule MWeb.Bot do
   @moduledoc "Helpers to interact with Telegram bot."
+  alias M.Bot
 
-  def webhook_url do
-    MWeb.Router.Helpers.bot_url(MWeb.Endpoint, :webhook, M.Bot.token())
+  def webhook_url(host) do
+    Path.join([host, "/api/bot", Bot.token()])
   end
 
-  def set_webhook do
-    M.Bot.set_webhook(webhook_url())
+  def set_webhook(host) do
+    Bot.set_webhook(webhook_url(host))
   end
 end
