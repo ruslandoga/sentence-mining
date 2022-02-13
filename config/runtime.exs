@@ -9,7 +9,7 @@ import Config
 
 config :logger, :console, format: "$time $metadata[$level] $message\n"
 
-if System.get_env("WEB_SERVER") || System.get_env("RELEASE_NAME") do
+if System.get_env("WEB") || System.get_env("RELEASE_NAME") do
   config :m, MWeb.Endpoint, server: true
 end
 

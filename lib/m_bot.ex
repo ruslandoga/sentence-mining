@@ -50,35 +50,39 @@ defmodule M.Bot do
   end
 
   defp handle_text("/today" <> _rest, %{chat_id: chat_id, from_id: from_id}) do
-    word_infos = Sentences.today_word_infos(from_id)
-
-    csv =
-      Enum.flat_map(word_infos, fn %{word: word, info: info} ->
-        Sentences.dump_to_csv(word, info)
-      end)
-
-    post_document(chat_id, csv, "all.csv", "text/csv")
+    csv = Sentences.recent_words_csv(from_id)
+    post_document(chat_id, csv, "today.csv", "text/csv")
   end
 
   defp handle_text("/all" <> _rest, %{chat_id: chat_id, from_id: from_id}) do
-    word_infos = Sentences.all_word_infos(from_id)
-
-    csv =
-      Enum.flat_map(word_infos, fn %{word: word, info: info} ->
-        Sentences.dump_to_csv(word, info)
-      end)
-
+    csv = Sentences.all_words_csv(from_id)
     post_document(chat_id, csv, "all.csv", "text/csv")
   end
 
-  defp handle_text("/" <> _rest, %{chat_id: chat_id}) do
-    post_message(chat_id, help_message())
+  defp handle_text("/" <> word, opts) do
+    handle_text(word, opts)
   end
 
   defp handle_text(word, %{chat_id: chat_id, from_id: from_id, message_id: _message_id}) do
-    word_info = Sentences.get_sentences(word)
-    {:ok, _word} = Sentences.save_word_info(from_id, word, word_info)
-    # csv = Sentences.dump_to_csv(word, word_info)
-    post_message(chat_id, "added #{word}")
+    case Sentences.fetch_dictionary_entries(word) do
+      {:entries, nil} ->
+        post_message(chat_id, "couldn't find anything")
+
+      {:entries, entries} ->
+        Sentences.save_entries(from_id, entries)
+        csv = Sentences.dump_to_csv(entries)
+        post_document(chat_id, csv, "#{word}.csv", "text/csv")
+
+      {:suggestions, suggestions} ->
+        suggestions_cmds = Enum.map(suggestions, fn s -> "/" <> s end)
+
+        message =
+          """
+          The word you have entered is not in the dictionary. Click on a spelling suggestion below or try your search again.
+
+          """ <> Enum.join(suggestions_cmds, "\n")
+
+        post_message(chat_id, message)
+    end
   end
 end

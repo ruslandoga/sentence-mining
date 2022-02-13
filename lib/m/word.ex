@@ -5,7 +5,8 @@ defmodule M.Word do
   schema "words" do
     field :user_id, :integer, primary_key: true
     field :word, :string, primary_key: true
-    field :info, :map
+    field :pronunciation, :string, primary_key: true
+    field :senses, {:array, :map}
 
     timestamps()
   end
