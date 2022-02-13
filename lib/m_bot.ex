@@ -42,6 +42,7 @@ defmodule M.Bot do
       /help
       /today
       /all
+      /count
     """
   end
 
@@ -59,6 +60,16 @@ defmodule M.Bot do
     post_document(chat_id, csv, "all.csv", "text/csv")
   end
 
+  defp handle_text("/count" <> _rest, %{chat_id: chat_id, from_id: from_id}) do
+    count = Sentences.count_words(from_id)
+
+    message = """
+    You have #{count} words
+    """
+
+    post_message(chat_id, message)
+  end
+
   defp handle_text("/" <> word, opts) do
     handle_text(word, opts)
   end
@@ -66,7 +77,7 @@ defmodule M.Bot do
   defp handle_text(word, %{chat_id: chat_id, from_id: from_id, message_id: _message_id}) do
     case Sentences.fetch_dictionary_entries(word) do
       {:entries, nil} ->
-        post_message(chat_id, "couldn't find anything")
+        post_message(chat_id, "couldn't find anything for " <> word)
 
       {:entries, entries} ->
         Sentences.save_entries(from_id, entries)
@@ -78,11 +89,14 @@ defmodule M.Bot do
 
         message =
           """
-          The word you have entered is not in the dictionary. Click on a spelling suggestion below or try your search again.
+          The word you have entered (#{word}) is not in the dictionary. Click on a spelling suggestion below or try your search again.
 
           """ <> Enum.join(suggestions_cmds, "\n")
 
         post_message(chat_id, message)
+
+      {:error, reason} ->
+        post_message(chat_id, word <> ": " <> reason)
     end
   end
 end

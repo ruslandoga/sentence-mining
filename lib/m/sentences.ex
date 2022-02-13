@@ -26,16 +26,35 @@ defmodule M.Sentences do
   # `got` doesn't work
   # `mother` missing definitions
   # jumper cables
-  @spec fetch_dictionary_entries(String.t()) :: {:entries, entries} | {:suggestions, [String.t()]}
+  @spec fetch_dictionary_entries(String.t()) ::
+          {:entries, entries} | {:suggestions, [String.t()]} | {:error, String.t()}
   def fetch_dictionary_entries(query) do
-    case learnersdictionary_get(Path.join("/definition/", query)) do
-      {:ok, %Finch.Response{status: 200, body: body}} ->
-        {:entries, parse_entries(body)}
+    query = String.trim(query)
 
-      {:ok, %Finch.Response{status: 302, headers: headers}} ->
-        "/spelling/" <> _word = location = :proplists.get_value("location", headers)
-        {:ok, %Finch.Response{status: 404, body: body}} = learnersdictionary_get(location)
-        {:suggestions, parse_suggestions(body)}
+    case query do
+      "" ->
+        {:error, "invalid request"}
+
+      _not_empty ->
+        case learnersdictionary_get(Path.join("/definition/", query)) do
+          {:ok, %Finch.Response{status: 200, body: body}} ->
+            {:entries, parse_entries(body)}
+
+          {:ok, %Finch.Response{status: 302, headers: headers}} ->
+            "/spelling/" <> _word = location = :proplists.get_value("location", headers)
+
+            case learnersdictionary_get(location) do
+              {:ok, %Finch.Response{status: 302, headers: headers}} ->
+                "/not-found" = :proplists.get_value("location", headers)
+                {:error, "not found"}
+
+              {:ok, %Finch.Response{status: 404, body: body}} ->
+                {:suggestions, parse_suggestions(body)}
+            end
+
+          {:error, _} ->
+            {:error, "invalid request"}
+        end
     end
   end
 
@@ -139,6 +158,15 @@ defmodule M.Sentences do
       on_conflict: {:replace, [:senses, :updated_at]},
       conflict_target: [:user_id, :word, :pronunciation]
     )
+  end
+
+  def count_words(user_id) do
+    words =
+      Word
+      |> where(user_id: ^user_id)
+      |> group_by([w], w.word)
+
+    Repo.aggregate(subquery(words), :count)
   end
 
   @spec all_words(pos_integer) :: [%Word{}]
