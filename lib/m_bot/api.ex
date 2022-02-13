@@ -20,15 +20,14 @@ defmodule M.Bot.API do
   # https://core.telegram.org/bots/api#senddocument
   def send_document(chat_id, content, filename, content_type, opts) do
     payload = Enum.into(opts, %{"chat_id" => chat_id})
-    boundary = Ecto.UUID.generate()
+    boundary = Base.url_encode64(:crypto.strong_rand_bytes(9))
 
-    body =
+    form =
       Enum.reduce(payload, [], fn {k, v}, acc ->
         [
           "--",
           boundary,
-          "\r\n",
-          "content-disposition: form-data; name=\"",
+          "\r\ncontent-disposition: form-data; name=\"",
           to_string(k),
           "\"\r\n\r\n",
           to_string(v),
@@ -39,11 +38,9 @@ defmodule M.Bot.API do
     file = [
       "--",
       boundary,
-      "\r\n",
-      "content-disposition: form-data; name=\"document\"; filename=\"",
+      "\r\ncontent-disposition: form-data; name=\"document\"; filename=\"",
       filename,
-      "\"\r\n",
-      "content-type: ",
+      "\"\r\ncontent-type: ",
       content_type,
       "\r\n\r\n",
       content,
@@ -52,20 +49,21 @@ defmodule M.Bot.API do
       "--"
     ]
 
-    body = [body | file]
+    multipart = [form | file]
 
     headers = [
-      {"content-type", "multipart/form-data; boundary=#{boundary}"}
+      {"content-type", "multipart/form-data; boundary=" <> boundary}
     ]
 
-    req = Finch.build(:post, build_url("sendDocument"), headers, body)
-    Finch.request(req, @finch, receive_timeout: 20_000)
+    request("sendDocument", headers, multipart)
   end
 
-  @default_headers [{"content-type", "application/json"}]
+  defp request(method, body) when is_map(body) do
+    request(method, [{"content-type", "application/json"}], Jason.encode_to_iodata!(body))
+  end
 
-  defp request(method, body) do
-    req = Finch.build(:post, build_url(method), @default_headers, Jason.encode_to_iodata!(body))
+  defp request(method, headers, body) do
+    req = Finch.build(:post, build_url(method), headers, body)
     Finch.request(req, @finch, receive_timeout: 20_000)
   end
 

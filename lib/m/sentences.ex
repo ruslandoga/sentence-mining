@@ -16,6 +16,8 @@ defmodule M.Sentences do
     |> Enum.map(fn tag -> Floki.text(tag) end)
   end
 
+  # TODO what if exact match not found?
+  # TODO what if more than one entry
   def get_sentences(word) do
     req = Finch.build(:get, "https://learnersdictionary.com/definition/" <> word)
     {:ok, %Finch.Response{body: body}} = Finch.request(req, @finch)
