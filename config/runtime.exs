@@ -7,7 +7,11 @@ import Config
 # any compile-time configuration in here, as it won't be applied.
 # The block below contains prod specific runtime configuration.
 
-config :logger, :console, format: "$time $metadata[$level] $message\n"
+config :logger, :console, format: "$time [$level] $message\n"
+
+config :sentry,
+  environment_name: config_env(),
+  included_environments: [:prod]
 
 if System.get_env("WEB") || System.get_env("RELEASE_NAME") do
   config :m, MWeb.Endpoint, server: true
@@ -15,8 +19,18 @@ end
 
 if config_env() == :prod do
   config :logger, level: :info
+  config :logger, backends: [:console, Sentry.LoggerBackend]
+
+  config :sentry, dsn: System.fetch_env!("SENTRY_DSN")
+
   config :m, M.Bot, token: System.fetch_env!("TG_BOT_KEY")
-  config :m, M.Repo, database: "m_prod.db"
+
+  config :m, M.Repo,
+    database: "m_prod.db",
+    # https://litestream.io/tips/#disable-autocheckpoints-for-high-write-load-servers
+    wal_auto_check_point: 0,
+    # https://litestream.io/tips/#busy-timeout
+    busy_timeout: 5000
 
   port = String.to_integer(System.get_env("PORT") || "4000")
 

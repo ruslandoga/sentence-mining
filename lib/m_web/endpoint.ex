@@ -1,10 +1,12 @@
 defmodule MWeb.Endpoint do
   use Plug.Router, init_mode: Application.fetch_env!(:plug, :init_mode)
+  use Sentry.PlugCapture
   use Plug.ErrorHandler
 
   plug Plug.Telemetry, event_prefix: [:web]
   plug :match
   plug Plug.Parsers, parsers: [:json], pass: ["application/json"], json_decoder: Jason
+  plug Sentry.PlugContext
   plug :dispatch
 
   post "/api/bot/:token" do

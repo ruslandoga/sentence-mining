@@ -44,7 +44,8 @@ defmodule M.MixProject do
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
       {:finch, "~> 0.10"},
-      {:nimble_csv, "~> 1.2"}
+      {:nimble_csv, "~> 1.2"},
+      {:sentry, "~> 8.0"}
     ]
   end
 
@@ -58,7 +59,8 @@ defmodule M.MixProject do
     [
       setup: ["deps.get", "ecto.setup"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
-      "ecto.reset": ["ecto.drop", "ecto.setup"]
+      "ecto.reset": ["ecto.drop", "ecto.setup"],
+      sentry_recompile: ["compile", "deps.compile sentry --force"]
       # test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
     ]
   end
