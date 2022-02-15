@@ -19,6 +19,10 @@ defmodule MWeb.Endpoint do
     send_resp(conn, 200, [])
   end
 
+  match _ do
+    send_resp(conn, 404, "Not found")
+  end
+
   defp handle_errors(conn, %{kind: _kind, reason: _reason, stack: _stack}) do
     send_resp(conn, conn.status, "Something went wrong")
   end
