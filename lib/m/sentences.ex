@@ -29,37 +29,33 @@ defmodule M.Sentences do
   @spec fetch_dictionary_entries(String.t()) ::
           {:entries, entries} | {:suggestions, [String.t()]} | {:error, String.t()}
   def fetch_dictionary_entries(query) do
-    query = String.trim(query)
-
-    case query do
+    case String.trim(query) do
       "" ->
         {:error, "invalid request"}
 
-      _not_empty ->
-        case learnersdictionary_get(Path.join("/definition/", query)) do
+      query ->
+        case britannica_get(Path.join("dictionary", URI.encode(query))) do
           {:ok, %Finch.Response{status: 200, body: body}} ->
             {:entries, parse_entries(body)}
 
-          {:ok, %Finch.Response{status: 302, headers: headers}} ->
+          {:ok, %Finch.Response{status: status, headers: headers}} when status in [301, 302] ->
             "/spelling/" <> _word = location = :proplists.get_value("location", headers)
 
-            case learnersdictionary_get(location) do
-              {:ok, %Finch.Response{status: 302, headers: headers}} ->
+            case britannica_get(location) do
+              {:ok, %Finch.Response{status: status, headers: headers}}
+              when status in [301, 302] ->
                 "/not-found" = :proplists.get_value("location", headers)
                 {:error, "not found"}
 
               {:ok, %Finch.Response{status: 404, body: body}} ->
                 {:suggestions, parse_suggestions(body)}
             end
-
-          {:error, _} ->
-            {:error, "invalid request"}
         end
     end
   end
 
-  defp learnersdictionary_get(path) do
-    req = Finch.build(:get, Path.join("https://learnersdictionary.com", path))
+  defp britannica_get(path) do
+    req = Finch.build(:get, Path.join("https://www.britannica.com", path))
     Finch.request(req, @finch)
   end
 
