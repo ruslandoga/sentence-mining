@@ -31,34 +31,28 @@ defmodule M.Sentences do
           {:entries, entries} | {:suggestions, [String.t()]} | {:error, String.t()}
   def fetch_dictionary_entries(query) do
     case String.trim(query) do
-      "" ->
-        {:error, "invalid request"}
-
-      query ->
-        case britannica_get(Path.join("dictionary", URI.encode(query))) do
-          {:ok, %Finch.Response{status: 200, body: body}} ->
-            {:entries, parse_entries(body)}
-
-          {:ok, %Finch.Response{status: status, headers: headers}} when status in [301, 302] ->
-            "https://www.britannica.com/dictionary/eb/spelling/" <> _word =
-              location = :proplists.get_value("location", headers)
-
-            case britannica_get(location) do
-              {:ok, %Finch.Response{status: status, headers: headers}}
-              when status in [301, 302] ->
-                "/not-found" = :proplists.get_value("location", headers)
-                {:error, "not found"}
-
-              {:ok, %Finch.Response{status: 404, body: body}} ->
-                {:suggestions, parse_suggestions(body)}
-            end
-        end
+      "" -> {:error, "invalid request"}
+      query -> britannica_get(Path.join("dictionary", URI.encode(query)))
     end
+  end
+
+  defp fetch_location(headers) do
+    :proplists.get_value("location", headers, nil) || raise "failed to fetch location"
   end
 
   defp britannica_get("http" <> _ = url) do
     req = Finch.build(:get, url)
-    Finch.request(req, @finch)
+
+    case Finch.request(req, @finch) do
+      {:ok, %Finch.Response{status: 200, body: body}} ->
+        {:entries, parse_entries(body)}
+
+      {:ok, %Finch.Response{status: 404, body: body}} ->
+        {:suggestions, parse_suggestions(body)}
+
+      {:ok, %Finch.Response{status: status, headers: headers}} when status in [301, 302] ->
+        britannica_get(fetch_location(headers))
+    end
   end
 
   defp britannica_get(path) do
