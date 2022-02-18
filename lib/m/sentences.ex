@@ -26,6 +26,7 @@ defmodule M.Sentences do
   # `got` doesn't work
   # `mother` missing definitions
   # jumper cables
+  # cars
   @spec fetch_dictionary_entries(String.t()) ::
           {:entries, entries} | {:suggestions, [String.t()]} | {:error, String.t()}
   def fetch_dictionary_entries(query) do
@@ -39,7 +40,8 @@ defmodule M.Sentences do
             {:entries, parse_entries(body)}
 
           {:ok, %Finch.Response{status: status, headers: headers}} when status in [301, 302] ->
-            "/spelling/" <> _word = location = :proplists.get_value("location", headers)
+            "https://www.britannica.com/dictionary/eb/spelling/" <> _word =
+              location = :proplists.get_value("location", headers)
 
             case britannica_get(location) do
               {:ok, %Finch.Response{status: status, headers: headers}}
@@ -54,15 +56,19 @@ defmodule M.Sentences do
     end
   end
 
-  defp britannica_get(path) do
-    req = Finch.build(:get, Path.join("https://www.britannica.com", path))
+  defp britannica_get("http" <> _ = url) do
+    req = Finch.build(:get, url)
     Finch.request(req, @finch)
+  end
+
+  defp britannica_get(path) do
+    britannica_get(Path.join("https://www.britannica.com", path))
   end
 
   defp parse_suggestions(body) do
     body
     |> Floki.parse_document!()
-    |> Floki.find(".links")
+    |> Floki.find("ul.links")
     |> Floki.find("li")
     |> Enum.map(fn li -> Floki.text(li) end)
   end

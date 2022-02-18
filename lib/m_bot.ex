@@ -75,28 +75,30 @@ defmodule M.Bot do
   end
 
   defp handle_text(word, %{chat_id: chat_id, from_id: from_id, message_id: _message_id}) do
-    case Sentences.fetch_dictionary_entries(word) do
-      {:entries, nil} ->
-        post_message(chat_id, "couldn't find anything for " <> word)
+    for word <- String.split(word, ["\n", ","], trim: true) do
+      case Sentences.fetch_dictionary_entries(word) do
+        {:entries, nil} ->
+          post_message(chat_id, "couldn't find anything for " <> word)
 
-      {:entries, entries} ->
-        Sentences.save_entries(from_id, entries)
-        csv = Sentences.dump_to_csv(entries)
-        post_document(chat_id, csv, "#{word}.csv", "text/csv")
+        {:entries, entries} ->
+          Sentences.save_entries(from_id, entries)
+          csv = Sentences.dump_to_csv(entries)
+          post_document(chat_id, csv, "#{word}.csv", "text/csv")
 
-      {:suggestions, suggestions} ->
-        suggestions_cmds = Enum.map(suggestions, fn s -> "/" <> s end)
+        {:suggestions, suggestions} ->
+          suggestions_cmds = Enum.map(suggestions, fn s -> "/" <> s end)
 
-        message =
-          """
-          The word you have entered (#{word}) is not in the dictionary. Click on a spelling suggestion below or try your search again.
+          message =
+            """
+            The word you have entered (#{word}) is not in the dictionary. Click on a spelling suggestion below or try your search again.
 
-          """ <> Enum.join(suggestions_cmds, "\n")
+            """ <> Enum.join(suggestions_cmds, "\n")
 
-        post_message(chat_id, message)
+          post_message(chat_id, message)
 
-      {:error, reason} ->
-        post_message(chat_id, word <> ": " <> reason)
+        {:error, reason} ->
+          post_message(chat_id, word <> ": " <> reason)
+      end
     end
   end
 end
