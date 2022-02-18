@@ -75,7 +75,7 @@ defmodule M.Bot do
   end
 
   defp handle_text(word, %{chat_id: chat_id, from_id: from_id, message_id: _message_id}) do
-    for word <- String.split(word, "\n", trim: true) do
+    for word <- String.split(word, ["\n", ","], trim: true) do
       case Sentences.fetch_dictionary_entries(word) do
         {:entries, nil} ->
           post_message(chat_id, "couldn't find anything for " <> word)
