@@ -118,7 +118,7 @@ defmodule M.Sentences do
         %{"definition" => definition, "examples" => examples} = sense
 
         Enum.map(examples, fn example ->
-          [example, String.replace(example, word, "___"), word, pronunciation, definition]
+          [example, word, pronunciation, definition]
         end)
       end)
     end)
