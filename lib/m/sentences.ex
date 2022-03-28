@@ -83,9 +83,12 @@ defmodule M.Sentences do
       pronunciation =
         entry
         |> Floki.find(".hw_txt ~ .hpron_word")
-        |> Floki.text()
-        |> String.replace_leading("/", "[")
-        |> String.replace_trailing("/", "]")
+        |> Enum.map(fn html ->
+          Floki.text(html)
+          |> String.replace_leading("/", "[")
+          |> String.replace_trailing("/", "]")
+        end)
+        |> Enum.join(" ")
 
       if pronunciation == "" do
         {:halt, nil}
@@ -97,12 +100,9 @@ defmodule M.Sentences do
           |> Floki.find(".sense")
           |> Enum.map(fn sense ->
             definition =
-              Floki.find(sense, ".def_text")
-              |> case do
-                [] = _not_found -> Floki.find(sense, ".un_text")
-                found -> found
-              end
-              |> Floki.text()
+              find_text(sense, ".def_text") || find_text(sense, ".un_text") ||
+                sense |> find_text(".both_text") |> postprocess_both_text() ||
+                sense |> find_text(".isyns") |> postprocess_isyns()
 
             examples =
               sense
@@ -115,6 +115,35 @@ defmodule M.Sentences do
         {:cont, Map.update(acc, {word, pronunciation}, senses, fn prev -> senses ++ prev end)}
       end
     end)
+  end
+
+  @spec find_text(Floki.html_tree(), String.t()) :: String.t() | nil
+  defp find_text(html, class) do
+    case Floki.find(html, class) do
+      [] ->
+        nil
+
+      found ->
+        found
+        |> Enum.map(fn html ->
+          html
+          |> Floki.text()
+          |> String.trim()
+        end)
+        |> Enum.join(", ")
+    end
+  end
+
+  defp postprocess_isyns(isyns) do
+    if isyns do
+      "= " <> String.replace(isyns, ~w[1 2 3 4 5 6 7 8 9 0], "")
+    end
+  end
+
+  defp postprocess_both_text(both_text) do
+    if both_text do
+      both_text |> String.replace("◊", "") |> String.trim()
+    end
   end
 
   @spec to_csv_rows(entries) :: [list(String.t())]
