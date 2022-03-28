@@ -7,7 +7,6 @@ on:
 
 jobs:
   mix:
-    name: elixir mix test
     runs-on: ubuntu-latest
 
     steps:

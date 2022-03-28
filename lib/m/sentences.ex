@@ -118,11 +118,16 @@ defmodule M.Sentences do
   end
 
   @spec to_csv_rows(entries) :: [list(String.t())]
-  defp to_csv_rows(entries) do
+  def to_csv_rows(entries) do
     Enum.flat_map(entries, fn {{word, pronunciation}, senses} ->
-      Enum.flat_map(senses, fn sense ->
+      Enum.reduce(senses, [], fn sense, acc ->
         %{"definition" => definition, "examples" => examples} = sense
-        [List.first(examples), word, pronunciation, definition]
+
+        if example = List.first(examples) do
+          [[example, word, pronunciation, definition] | acc]
+        else
+          acc
+        end
       end)
     end)
   end
