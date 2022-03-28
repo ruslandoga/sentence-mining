@@ -1,5 +1,5 @@
 defmodule MWeb.Endpoint do
-  use Plug.Router, init_mode: Application.fetch_env!(:plug, :init_mode)
+  use Plug.Router, init_mode: Application.compile_env!(:plug, :init_mode)
   use Sentry.PlugCapture
   use Plug.ErrorHandler
 
