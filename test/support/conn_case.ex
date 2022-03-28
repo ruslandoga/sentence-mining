@@ -21,7 +21,6 @@ defmodule MWeb.ConnCase do
     quote do
       # Import conveniences for testing with connections
       import Plug.Conn
-      import Phoenix.ConnTest
       import MWeb.ConnCase
 
       alias MWeb.Router.Helpers, as: Routes
@@ -29,11 +28,5 @@ defmodule MWeb.ConnCase do
       # The default endpoint for testing
       @endpoint MWeb.Endpoint
     end
-  end
-
-  setup tags do
-    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(M.Repo, shared: not tags[:async])
-    on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
-    {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 end

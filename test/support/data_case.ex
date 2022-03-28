@@ -21,15 +21,12 @@ defmodule M.DataCase do
       alias M.Repo
 
       import Ecto
-      import Ecto.Changeset
-      import Ecto.Query
+      import Ecto.{Changeset, Query}
       import M.DataCase
     end
   end
 
-  setup tags do
-    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(M.Repo, shared: not tags[:async])
-    on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
+  setup do
     :ok
   end
 
