@@ -122,10 +122,7 @@ defmodule M.Sentences do
     Enum.flat_map(entries, fn {{word, pronunciation}, senses} ->
       Enum.flat_map(senses, fn sense ->
         %{"definition" => definition, "examples" => examples} = sense
-
-        Enum.map(examples, fn example ->
-          [example, word, pronunciation, definition]
-        end)
+        [List.first(examples), word, pronunciation, definition]
       end)
     end)
   end
