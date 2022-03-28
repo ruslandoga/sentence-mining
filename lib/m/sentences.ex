@@ -96,7 +96,13 @@ defmodule M.Sentences do
           |> Floki.find(".sblock")
           |> Floki.find(".sense")
           |> Enum.map(fn sense ->
-            definition = sense |> Floki.find(".def_text") |> Floki.text()
+            definition =
+              Floki.find(sense, ".def_text")
+              |> case do
+                [] = _not_found -> Floki.find(sense, ".un_text")
+                found -> found
+              end
+              |> Floki.text()
 
             examples =
               sense
