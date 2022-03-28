@@ -165,12 +165,10 @@ defmodule M.Sentences do
   end
 
   def count_words(user_id) do
-    words =
-      Word
-      |> where(user_id: ^user_id)
-      |> group_by([w], w.word)
-
-    Repo.aggregate(subquery(words), :count)
+    Word
+    |> where(user_id: ^user_id)
+    |> select([w], fragment("count(*)"))
+    |> Repo.one()
   end
 
   @spec all_words(pos_integer) :: [%Word{}]
