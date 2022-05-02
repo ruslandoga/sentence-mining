@@ -19,6 +19,10 @@ defmodule MWeb.Endpoint do
     send_resp(conn, 200, [])
   end
 
+  get "/health" do
+    send_resp(conn, 200, [])
+  end
+
   match _ do
     send_resp(conn, 404, "Not found")
   end
