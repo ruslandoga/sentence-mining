@@ -9,6 +9,10 @@ defmodule M.Bot.API do
     request("setWebhook", %{"url" => url})
   end
 
+  def get_webhook_info do
+    request("getWebhookInfo", %{})
+  end
+
   @impl true
   # https://core.telegram.org/bots/api#sendmessage
   def send_message(chat_id, text, opts) do
