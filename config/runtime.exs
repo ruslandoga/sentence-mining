@@ -31,7 +31,7 @@ if config_env() == :prod do
     wal_auto_check_point: 0,
     # https://litestream.io/tips/#busy-timeout
     busy_timeout: 5000,
-    cache_size: -1000
+    cache_size: -2000
 
   port = String.to_integer(System.get_env("PORT") || "4000")
 
