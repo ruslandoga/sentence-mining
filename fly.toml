@@ -7,7 +7,7 @@ kill_timeout = 5
 processes = []
 
 [build]
-  image = "ghcr.io/ruslandoga/sentence-mining:754760885593f0fc96c99f1a65a25673110655c1"
+  image = "ghcr.io/ruslandoga/sentence-mining:master"
 
 [env]
   DB_PATH = "/data/m_prod.db"
