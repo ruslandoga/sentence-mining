@@ -1,3 +1,4 @@
+FROM litestream/litestream:0.3.8 AS litestream
 FROM hexpm/elixir:1.13.4-erlang-24.3.3-alpine-3.15.3 as build
 
 # install build dependencies
@@ -8,8 +9,7 @@ RUN mkdir /app
 WORKDIR /app
 
 # install hex + rebar
-RUN mix local.hex --force && \
-    mix local.rebar --force
+RUN mix local.hex --force && mix local.rebar --force
 
 # set build ENV
 ENV MIX_ENV=prod
@@ -40,7 +40,8 @@ USER nobody:nobody
 ENV SHELL=/bin/bash
 
 COPY --from=build --chown=nobody:nobody /app/_build/prod/rel/m ./
+COPY --from=litestream /usr/local/bin/litestream /usr/local/bin/litestream
 
 ENV HOME=/app
 
-CMD /app/bin/m start
+CMD litestream replicate -exec "/app/bin/m start" $DB_PATH $REPLICA_URL
