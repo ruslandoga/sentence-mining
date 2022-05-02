@@ -20,12 +20,9 @@ defmodule M.MixProject do
   def application do
     [
       mod: {M.Application, []},
-      extra_applications: extra_applications(Mix.env())
+      extra_applications: [:logger, :runtime_tools]
     ]
   end
-
-  defp extra_applications(:prod), do: [:logger, :runtime_tools, :os_mon]
-  defp extra_applications(_env), do: [:logger, :runtime_tools]
 
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:test), do: ["lib", "test/support"]
