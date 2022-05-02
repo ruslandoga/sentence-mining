@@ -1,10 +1,6 @@
 dbs:
   - path: ${DB_PATH}
     replicas:
-      - name: aws
-        url: ${AWS_REPLICA_URL}  
-        access-key-id: ${AWS_ACCESS_KEY_ID}
-        secret-access-key: ${AWS_SECRET_ACCESS_KEY}
       - name: backblaze
         type: s3  
         access-key-id: ${BACKBLAZE_ACCESS_KEY_ID}
