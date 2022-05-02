@@ -44,12 +44,6 @@ if config_env() == :prod do
       ip: {0, 0, 0, 0, 0, 0, 0, 0},
       port: port
     ]
-
-  config :m, Litestream,
-    repo: M.Repo,
-    replica_url: System.fetch_env!("REPLICA_URL"),
-    access_key_id: System.fetch_env!("ACCESS_KEY_ID"),
-    secret_access_key: System.fetch_env!("SECRET_ACCESS_KEY")
 end
 
 if config_env() == :dev do
