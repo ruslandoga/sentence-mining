@@ -4,19 +4,31 @@ defmodule M.Application do
 
   @impl true
   def start(_type, _args) do
-    endpoint_config = Application.fetch_env!(:m, MWeb.Endpoint)
-    http = Keyword.fetch!(endpoint_config, :http)
-
     children = [
       {Finch, name: M.Finch, pools: %{"https://api.telegram.org" => [protocol: :http2]}},
       M.Repo,
+      maybe_litestream(),
       MWeb.Telemetry,
-      if endpoint_config[:server] do
-        {Plug.Cowboy, scheme: :http, plug: MWeb.Endpoint, options: http}
-      end
+      maybe_server()
     ]
 
     children = Enum.reject(children, &is_nil/1)
     Supervisor.start_link(children, strategy: :one_for_one, name: M.Supervisor)
+  end
+
+  @app :m
+
+  defp maybe_litestream do
+    if config = Application.get_env(@app, Litestream) do
+      {Litestream, config}
+    end
+  end
+
+  defp maybe_server do
+    config = Application.fetch_env!(@app, MWeb.Endpoint)
+
+    if config[:server] do
+      {Plug.Cowboy, scheme: :http, plug: MWeb.Endpoint, options: Keyword.fetch!(config, :http)}
+    end
   end
 end

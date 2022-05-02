@@ -39,3 +39,5 @@ jobs:
 
       - name: Run tests
         run: mix test
+        env:
+          SHELL: /bin/bash

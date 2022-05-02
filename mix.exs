@@ -46,7 +46,8 @@ defmodule M.MixProject do
       {:finch, "~> 0.10"},
       {:nimble_csv, "~> 1.2"},
       {:sentry, "~> 8.0"},
-      {:rexbug, "~> 1.0"}
+      {:rexbug, "~> 1.0"},
+      {:litestream, "~> 0.2.0"}
     ]
   end
 
