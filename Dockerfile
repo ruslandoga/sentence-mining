@@ -40,7 +40,8 @@ USER nobody:nobody
 
 COPY --from=build --chown=nobody:nobody /app/_build/prod/rel/m ./
 COPY --from=litestream /usr/local/bin/litestream /usr/local/bin/litestream
+COPY litestream.yml /etc/litestream.yml
 
 ENV HOME=/app
 
-CMD litestream replicate -exec "/app/bin/m start" $DB_PATH $REPLICA_URL
+CMD litestream replicate -exec "/app/bin/m start"
