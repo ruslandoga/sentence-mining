@@ -26,7 +26,7 @@ if config_env() == :prod do
   config :m, M.Bot, token: System.fetch_env!("TG_BOT_KEY")
 
   config :m, M.Repo,
-    database: "m_prod.db",
+    database: System.get_env("DB_PATH") || "m_prod.db",
     # https://litestream.io/tips/#disable-autocheckpoints-for-high-write-load-servers
     wal_auto_check_point: 0,
     # https://litestream.io/tips/#busy-timeout
