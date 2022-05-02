@@ -7,7 +7,7 @@ defmodule M.Application do
     children = [
       {Finch, name: M.Finch, pools: %{"https://api.telegram.org" => [protocol: :http2]}},
       M.Repo,
-      maybe_litestream(),
+      # maybe_litestream(),
       MWeb.Telemetry,
       maybe_server()
     ]
@@ -18,11 +18,11 @@ defmodule M.Application do
 
   @app :m
 
-  defp maybe_litestream do
-    if config = Application.get_env(@app, Litestream) do
-      {Litestream, config}
-    end
-  end
+  # defp maybe_litestream do
+  #   if config = Application.get_env(@app, Litestream) do
+  #     {Litestream, config}
+  #   end
+  # end
 
   defp maybe_server do
     config = Application.fetch_env!(@app, MWeb.Endpoint)
