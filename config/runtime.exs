@@ -52,7 +52,7 @@ if config_env() == :dev do
   config :m, MWeb.Endpoint, http: [ip: {127, 0, 0, 1}, port: 4000]
 
   config :m, M.Repo,
-    database: "m_dev.db",
+    database: System.get_env("DATABASE") || "m_dev.db",
     show_sensitive_data_on_connection_error: true
 end
 
