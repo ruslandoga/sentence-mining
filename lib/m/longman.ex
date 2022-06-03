@@ -86,11 +86,18 @@ defmodule M.Longman do
 
         Enum.reduce(examples, acc, fn example, acc ->
           %{"text" => text, "audio" => audio} = example
-          [[text, audio, word, pronunciation, definition] | acc]
+          [[text, render_audio(audio), word, pronunciation, definition] | acc]
         end)
       end)
     end)
   end
+
+  defp render_audio(url) when is_binary(url) do
+    url = %URI{URI.parse(url) | query: nil}
+    "[sound:#{url}]"
+  end
+
+  defp render_audio(nil), do: nil
 
   defp fetch_location(headers) do
     :proplists.get_value("location", headers, nil) || raise "failed to fetch location"
