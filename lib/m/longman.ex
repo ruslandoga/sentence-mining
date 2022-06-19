@@ -25,7 +25,7 @@ defmodule M.Longman do
   def all_words_csv(user_id) do
     Word
     |> where(user_id: ^user_id)
-    |> select([w], {{w.word, w.pronunciation}, w.senses})
+    |> select([w], {{w.word, w.pronunciation}, w.senses, w.inserted_at})
     |> Repo.all()
     |> dump_to_csv()
   end
@@ -38,7 +38,7 @@ defmodule M.Longman do
     Word
     |> where(user_id: ^user_id)
     |> where([w], w.updated_at >= ^day_ago)
-    |> select([w], {{w.word, w.pronunciation}, w.senses})
+    |> select([w], {{w.word, w.pronunciation}, w.senses, w.inserted_at})
     |> Repo.all()
     |> dump_to_csv()
   end
@@ -73,21 +73,43 @@ defmodule M.Longman do
   end
 
   defp to_csv_rows(entries, opts) do
-    Enum.flat_map(entries, fn {{word, pronunciation}, senses} ->
-      Enum.reduce(senses, [], fn sense, acc ->
-        %{"definition" => definition, "examples" => examples} = sense
+    Enum.flat_map(entries, &to_csv_row(&1, opts))
+  end
 
-        examples =
-          if opts[:first] do
-            examples |> List.first() |> List.wrap()
-          else
-            examples
-          end
+  defp to_csv_row({{word, pronunciation}, senses}, opts) do
+    Enum.reduce(senses, [], fn sense, acc ->
+      %{"definition" => definition, "examples" => examples} = sense
 
-        Enum.reduce(examples, acc, fn example, acc ->
-          %{"text" => text, "audio" => audio} = example
-          [[text, render_audio(audio), word, pronunciation, definition] | acc]
-        end)
+      examples =
+        if opts[:first] do
+          examples |> List.first() |> List.wrap()
+        else
+          examples
+        end
+
+      Enum.reduce(examples, acc, fn example, acc ->
+        %{"text" => text, "audio" => audio} = example
+        [[text, render_audio(audio), word, pronunciation, definition] | acc]
+      end)
+    end)
+  end
+
+  defp to_csv_row({{word, pronunciation}, senses, inserted_at}, opts) do
+    date = inserted_at |> NaiveDateTime.to_date() |> Date.to_iso8601()
+
+    Enum.reduce(senses, [], fn sense, acc ->
+      %{"definition" => definition, "examples" => examples} = sense
+
+      examples =
+        if opts[:first] do
+          examples |> List.first() |> List.wrap()
+        else
+          examples
+        end
+
+      Enum.reduce(examples, acc, fn example, acc ->
+        %{"text" => text, "audio" => audio} = example
+        [[text, render_audio(audio), word, pronunciation, definition, date] | acc]
       end)
     end)
   end
