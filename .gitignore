@@ -32,8 +32,10 @@ m-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# Database files
+*.db
+*.db-*
+
 .envrc
 .DS_Store
 /.elixir_ls/
-
-m_*.db*

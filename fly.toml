@@ -11,6 +11,8 @@ processes = []
 
 [env]
   DB_PATH = "/data/m_prod.db"
+  PHX_SERVER = "true"
+  PHX_HOST = "words.edify.space"
 
 [experimental]
   allowed_public_ports = []

@@ -21,6 +21,7 @@ defmodule MWeb.ConnCase do
     quote do
       # Import conveniences for testing with connections
       import Plug.Conn
+      import Phoenix.ConnTest
       import MWeb.ConnCase
 
       alias MWeb.Router.Helpers, as: Routes
@@ -28,5 +29,10 @@ defmodule MWeb.ConnCase do
       # The default endpoint for testing
       @endpoint MWeb.Endpoint
     end
+  end
+
+  setup tags do
+    M.DataCase.setup_sandbox(tags)
+    {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 end

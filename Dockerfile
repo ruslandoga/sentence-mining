@@ -1,8 +1,17 @@
+##############
+# LITESTREAM #
+##############
+
 FROM litestream/litestream:0.3.8 AS litestream
-FROM hexpm/elixir:1.13.4-erlang-24.3.3-alpine-3.15.3 as build
+
+#########
+# BUILD #
+#########
+
+FROM hexpm/elixir:1.13.4-erlang-25.0.2-alpine-3.16.0 as build
 
 # install build dependencies
-RUN apk add --no-cache --update git build-base
+RUN apk add --no-cache --update git build-base nodejs npm
 
 # prepare build dir
 RUN mkdir /app
@@ -26,11 +35,18 @@ COPY lib lib
 RUN mix sentry_recompile
 COPY config/runtime.exs config/
 
+# build assets
+COPY assets assets
+RUN mix assets.deploy
+
 # build release
 RUN mix release
 
-# prepare release image
-FROM alpine:3.15.3 AS app
+#######
+# APP #
+#######
+
+FROM alpine:3.16.0 AS app
 RUN apk add --no-cache --update bash openssl libgcc libstdc++
 
 WORKDIR /app
@@ -44,4 +60,4 @@ COPY litestream.yml /etc/litestream.yml
 
 ENV HOME=/app
 
-CMD litestream replicate -exec "/app/bin/m start"
+CMD litestream restore -if-db-not-exists -if-replica-exists $DATABASE_PATH && litestream replicate -exec "/app/bin/m start"

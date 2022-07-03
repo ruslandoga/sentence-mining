@@ -1,33 +1,62 @@
 defmodule MWeb.Endpoint do
-  use Plug.Router, init_mode: Application.compile_env!(:plug, :init_mode)
   use Sentry.PlugCapture
-  use Plug.ErrorHandler
+  use Phoenix.Endpoint, otp_app: :m
 
-  plug Plug.Telemetry, event_prefix: [:web]
-  plug :match
-  plug Plug.Parsers, parsers: [:json], pass: ["application/json"], json_decoder: Jason
+  # The session will be stored in the cookie and signed,
+  # this means its contents can be read but not tampered with.
+  # Set :encryption_salt if you would also like to encrypt it.
+  @session_options [
+    store: :cookie,
+    key: "_w_key",
+    signing_salt: "qH39K17q"
+  ]
+
+  socket("/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]])
+
+  # Serve at "/" the static files from "priv/static" directory.
+  #
+  # You should set gzip to true if you are running phx.digest
+  # when deploying your static files in production.
+  plug Plug.Static,
+    at: "/",
+    from: :m,
+    gzip: true,
+    only: ~w(assets fonts images favicon.ico robots.txt)
+
+  # Code reloading can be explicitly enabled under the
+  # :code_reloader configuration of your endpoint.
+  if code_reloading? do
+    socket("/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket)
+    plug Phoenix.LiveReloader
+    plug Phoenix.CodeReloader
+    plug Phoenix.Ecto.CheckRepoStatus, otp_app: :m
+  end
+
+  # plug Phoenix.LiveDashboard.RequestLogger,
+  #   param_key: "request_logger",
+  #   cookie_key: "request_logger"
+
+  plug :health
+
+  plug Plug.RequestId
+  plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
+
+  plug Plug.Parsers,
+    parsers: [:urlencoded, :multipart, :json],
+    pass: ["*/*"],
+    json_decoder: Phoenix.json_library()
+
   plug Sentry.PlugContext
-  plug :dispatch
 
-  post "/api/bot/:token" do
-    alias M.Bot
+  plug Plug.MethodOverride
+  plug Plug.Head
+  plug Plug.Session, @session_options
+  plug MWeb.Router
 
-    if Bot.token() == token do
-      Bot.handle(conn.body_params)
+  def health(%Plug.Conn{path_info: path_info} = conn, _opts) do
+    case path_info do
+      ["health"] -> conn |> send_resp(200, []) |> halt()
+      _other -> conn
     end
-
-    send_resp(conn, 200, [])
-  end
-
-  get "/health" do
-    send_resp(conn, 200, [])
-  end
-
-  match _ do
-    send_resp(conn, 404, "Not found")
-  end
-
-  defp handle_errors(conn, %{kind: _kind, reason: _reason, stack: _stack}) do
-    send_resp(conn, conn.status, "Something went wrong")
   end
 end
