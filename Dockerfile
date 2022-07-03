@@ -60,4 +60,4 @@ COPY litestream.yml /etc/litestream.yml
 
 ENV HOME=/app
 
-CMD litestream restore -if-db-not-exists -if-replica-exists $DATABASE_PATH && litestream replicate -exec "/app/bin/m start"
+CMD litestream restore -if-db-not-exists -if-replica-exists $DB_PATH && litestream replicate -exec "/app/bin/m start"
