@@ -18,7 +18,11 @@ defmodule MWeb.Router do
     pipe_through(:browser)
 
     live "/", KanjiLive, :index
-    live "/:word", KanjiLive, :show
+    live "/:word", KanjiLive, :word
+    live "/radical/:word", KanjiLive, :radical
+    live "/phonetic/:word", KanjiLive, :phonetic
+    live "/on/:word", KanjiLive, :on
+    live "/kun/:word", KanjiLive, :kun
   end
 
   scope "/api", MWeb do
