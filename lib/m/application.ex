@@ -4,24 +4,25 @@ defmodule M.Application do
 
   @impl true
   def start(_type, _args) do
+    repo_config = Application.fetch_env!(:m, M.Repo)
+
     children = [
       {Finch, name: M.Finch, pools: %{"https://api.telegram.org" => [protocol: :http2]}},
       M.Repo,
+      {M.Release.Migrator, migrate: repo_config[:migrate]},
       MWeb.Telemetry,
-      maybe_server()
+      {Phoenix.PubSub, name: M.PubSub},
+      MWeb.Endpoint
     ]
 
-    children = Enum.reject(children, &is_nil/1)
     Supervisor.start_link(children, strategy: :one_for_one, name: M.Supervisor)
   end
 
-  @app :m
-
-  defp maybe_server do
-    config = Application.fetch_env!(@app, MWeb.Endpoint)
-
-    if config[:server] do
-      {Plug.Cowboy, scheme: :http, plug: MWeb.Endpoint, options: Keyword.fetch!(config, :http)}
-    end
+  # Tell Phoenix to update the endpoint configuration
+  # whenever the application is updated.
+  @impl true
+  def config_change(changed, _new, removed) do
+    MWeb.Endpoint.config_change(changed, removed)
+    :ok
   end
 end
