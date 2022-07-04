@@ -41,12 +41,18 @@ defmodule M.Kanjis do
     |> Repo.all()
   end
 
+  defmacrop json_each(field) do
+    quote do
+      fragment("json_each(?)", unquote(field))
+    end
+  end
+
   def fetch_kanjis_for_kun(kun) do
     with_bracket = kun <> "（%"
 
     Kanji
-    |> join(:inner, [k], j in fragment("json_each(?)", k.reg_kun),
-      on: j.value == ^kun or like(j.value, ^with_bracket) or j.value == ^star(kun)
+    |> join(:inner, [k], j in json_each(k.reg_kun),
+      on: j.value == ^kun or j.value == ^star(kun) or like(j.value, ^with_bracket)
     )
     |> where([k], not is_nil(k.jlpt_full))
     |> Repo.all()
@@ -54,16 +60,14 @@ defmodule M.Kanjis do
 
   def fetch_kanjis_for_on(on) do
     Kanji
-    |> join(:inner, [k], j in fragment("json_each(?)", k.reg_on),
-      on: j.value == ^on or j.value == ^star(on)
-    )
+    |> join(:inner, [k], j in json_each(k.reg_on), on: j.value == ^on or j.value == ^star(on))
     |> where([k], not is_nil(k.jlpt_full))
     |> Repo.all()
   end
 
   def fetch_kanjis_for_meaning(meaning) do
     Kanji
-    |> join(:inner, [k], j in fragment("json_each(?)", k.compact_meaning), on: j.value == ^meaning)
+    |> join(:inner, [k], j in json_each(k.compact_meaning), on: j.value == ^meaning)
     |> where([k], not is_nil(k.jlpt_full))
     |> Repo.all()
   end
