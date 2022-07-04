@@ -79,4 +79,30 @@ defmodule M.Kanjis do
       value <> "*"
     end
   end
+
+  defmodule JLPTWord do
+    use Ecto.Schema
+
+    @primary_key false
+    schema "jlpt_words" do
+      field :expression, :string, primary_key: true
+      field :meaning, :string
+      field :reading, :string
+      field :level, :integer
+      field :tags, :string
+    end
+  end
+
+  def list_words do
+    JLPTWord
+    |> order_by([w], desc: w.level)
+    |> limit(20)
+    |> Repo.all()
+  end
+
+  def get_word(word) do
+    JLPTWord
+    |> where(expression: ^word)
+    |> Repo.one()
+  end
 end

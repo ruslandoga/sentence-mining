@@ -10,9 +10,21 @@ defmodule MWeb.KanjiLive do
   def render(assigns) do
     ~H"""
     <div class="p-4 max-w-screen-xl mx-auto">
-      <div class="text-3xl text-center"><%= @word %></div>
-      <div class="mt-4 flex -mx-2 flex-wrap">
+      <div class="text-3xl text-center"><%= @word %><%= if @word_info do %> <span class="text-gray-400">(<%= @word_info.reading %>)</span><% end %></div>
+
+      <%= if @word_info do %>
+      <div class="mt-2 flex space-x-4 justify-center text-gray-400">
+        <div class="text-green-600 dark:text-green-300"><%= @word_info.meaning %></div>
+        <div><%= @word_info.tags %></div>
+      </div>
+      <% end %>
+
+      <div class="mt-4 flex -mx-2 flex-wrap justify-center">
       <%= for kanji <- @kanjis do %><.kanji_card kanji={kanji} /><% end %>
+      </div>
+
+      <div class="mt-4 flex -mx-2 flex-wrap">
+      <%= for word <- @words do %><.word_card word={word} /><% end %>
       </div>
     </div>
     """
@@ -32,7 +44,7 @@ defmodule MWeb.KanjiLive do
       <div class="p-4 bg-gray-50 border border-gray-200 dark:border-none dark:bg-zinc-700 rounded h-full">
         <h3 class="flex items-center justify-between">
           <span class="text-2xl"><%= @kanji.kanji %></span>
-          <div class="text-sm text-gray-400 text-right">
+          <div class="ml-4 text-sm text-gray-400 text-right">
             <%= if @jlpt do %>
               <div><%= @jlpt %></div>
             <% end %>
@@ -84,6 +96,30 @@ defmodule MWeb.KanjiLive do
     """
   end
 
+  defp word_card(assigns) do
+    ~H"""
+    <div class="p-2 w-full md:w-1/2 lg:w-1/3">
+      <div class="p-4 bg-gray-50 border border-gray-200 dark:border-none dark:bg-zinc-700 rounded h-full">
+        <h3 class="flex items-center justify-between">
+          <%= live_patch @word.expression, to: Routes.kanji_path(MWeb.Endpoint, :word, @word.expression), class: "text-2xl hover:underline underline-offset-4 decoration-2" %>
+          <div class="ml-4 text-xs text-gray-400 text-right">
+            <div><%= @word.tags %></div>
+          </div>
+        </h3>
+
+        <dl class="mt-2">
+          <.info_point title="reading" color="text-sky-600 dark:text-sky-300">
+            <%= @word.reading %>
+          </.info_point>
+          <.info_point title="meaning" color="text-green-600 dark:text-green-300">
+            <%= @word.meaning %>
+          </.info_point>
+        </dl>
+      </div>
+    </div>
+    """
+  end
+
   defp info_point(assigns) do
     ~H"""
     <div>
@@ -93,17 +129,24 @@ defmodule MWeb.KanjiLive do
     """
   end
 
+  alias M.Kanjis
+
   @impl true
   def handle_params(%{"word" => word}, _uri, socket) do
-    {:noreply, socket |> assign(word: word) |> fetch_kanji()}
+    word_info = Kanjis.get_word(word)
+
+    {:noreply,
+     socket |> assign(word: word, word_info: word_info, page_title: word) |> fetch_kanji()}
   end
 
   def handle_params(_params, _uri, socket) do
-    {:noreply, socket |> assign(word: nil, page_title: "", kanjis: [])}
+    words = Kanjis.list_words()
+
+    {:noreply,
+     socket |> assign(word: nil, word_info: nil, page_title: "", kanjis: [], words: words)}
   end
 
   defp fetch_kanji(socket) do
-    alias M.Kanjis
     word = socket.assigns.word
 
     kanjis =
@@ -116,7 +159,7 @@ defmodule MWeb.KanjiLive do
         :meaning -> Kanjis.fetch_kanjis_for_meaning(word)
       end
 
-    assign(socket, page_title: word, kanjis: kanjis)
+    assign(socket, kanjis: kanjis, words: [])
   end
 
   defp trim_kun(kun) do
