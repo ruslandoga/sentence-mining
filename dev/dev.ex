@@ -134,6 +134,12 @@ defmodule Dev do
              ] ->
           {k, if(v, do: String.to_integer(v))}
 
+        {k, v} when k in [:reg_kun, :reg_on] ->
+          {k, if(v, do: json_array_on(v, "、"))}
+
+        {:meaning = k, v} ->
+          {k, if(v, do: json_array_on(v, ";"))}
+
         other ->
           other
       end)
@@ -143,5 +149,12 @@ defmodule Dev do
       {count, _} = Repo.insert_all(Kanji, chunk)
       Logger.debug("inserted #{count} into kanji dict")
     end)
+  end
+
+  defp json_array_on(value, separator) do
+    value
+    |> String.split(separator, trim: true)
+    |> Enum.map(&String.trim/1)
+    |> Jason.encode!()
   end
 end
