@@ -5,9 +5,9 @@ CREATE TABLE IF NOT EXISTS "kanji_dict" ("frequency" INTEGER, "jlpt" INTEGER, "j
 CREATE INDEX "kanji_dict_kanji_index" ON "kanji_dict" ("kanji");
 CREATE INDEX "kanji_dict_radical_index" ON "kanji_dict" ("radical") WHERE radical is not null;
 CREATE INDEX "kanji_dict_phonetic_index" ON "kanji_dict" ("phonetic") WHERE phonetic is not null;
-CREATE TABLE IF NOT EXISTS "jlpt_words" ("expression" TEXT PRIMARY KEY, "level" INTEGER, "reading" TEXT, "meaning" TEXT NOT NULL, "tags" TEXT) STRICT;
+CREATE TABLE IF NOT EXISTS "jlpt_words" ("expression" TEXT PRIMARY KEY, "level" INTEGER NOT NULL, "reading" TEXT NOT NULL, "meaning" TEXT NOT NULL, "tags" TEXT NOT NULL) STRICT;
 INSERT INTO schema_migrations VALUES(20220212223410,'2022-05-08T11:18:24');
 INSERT INTO schema_migrations VALUES(20220508111755,'2022-05-08T11:18:24');
 INSERT INTO schema_migrations VALUES(20220703111736,'2022-07-03T11:52:36');
 INSERT INTO schema_migrations VALUES(20220703163141,'2022-07-03T16:50:26');
-INSERT INTO schema_migrations VALUES(20220704141700,'2022-07-04T14:48:36');
+INSERT INTO schema_migrations VALUES(20220704141700,'2022-07-04T14:59:25');

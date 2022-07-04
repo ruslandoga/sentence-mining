@@ -221,7 +221,13 @@ defmodule Dev do
         |> NimbleCSV.RFC4180.parse_string(skip_headers: true)
         |> Enum.flat_map(fn [expression, reading, meaning, tags] ->
           for expression <- String.split(expression, ";", trim: true) do
-            %{expression: expression, reading: reading, meaning: meaning, tags: tags}
+            %{
+              expression: expression,
+              reading: reading,
+              meaning: meaning,
+              tags: tags,
+              level: level
+            }
           end
         end)
       end)
@@ -230,7 +236,9 @@ defmodule Dev do
     |> Enum.chunk_every(100)
     |> Enum.each(fn chunk ->
       {count, _} =
-        Repo.insert_all(JLPTWord, chunk, on_conflict: {:replace, [:meaning, :reading, :tags]})
+        Repo.insert_all(JLPTWord, chunk,
+          on_conflict: {:replace, [:meaning, :reading, :tags, :level]}
+        )
 
       Logger.debug("inserted #{count} into jlpt words")
     end)
