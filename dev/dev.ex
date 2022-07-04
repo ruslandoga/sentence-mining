@@ -144,10 +144,12 @@ defmodule Dev do
           other
       end)
     end)
+    # |> Enum.chunk_every(5)
     |> Enum.chunk_every(1000)
     |> Enum.each(fn chunk ->
       {count, _} = Repo.insert_all(Kanji, chunk)
       Logger.debug("inserted #{count} into kanji dict")
+      # :erlang.garbage_collect(self())
     end)
   end
 
