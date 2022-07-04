@@ -13,7 +13,7 @@ defmodule M.Kanjis do
       field :radical, :string
       field :radvar, :string
       field :phonetic, :string
-      field :compact_meaning, :string
+      field :compact_meaning, {:array, :string}
       field :reg_on, {:array, :string}
       field :reg_kun, {:array, :string}
     end
@@ -57,6 +57,13 @@ defmodule M.Kanjis do
     |> join(:inner, [k], j in fragment("json_each(?)", k.reg_on),
       on: j.value == ^on or j.value == ^star(on)
     )
+    |> where([k], not is_nil(k.jlpt_full))
+    |> Repo.all()
+  end
+
+  def fetch_kanjis_for_meaning(meaning) do
+    Kanji
+    |> join(:inner, [k], j in fragment("json_each(?)", k.compact_meaning), on: j.value == ^meaning)
     |> where([k], not is_nil(k.jlpt_full))
     |> Repo.all()
   end

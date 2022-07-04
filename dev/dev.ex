@@ -137,7 +137,7 @@ defmodule Dev do
         {k, v} when k in [:reg_kun, :reg_on] ->
           {k, if(v, do: json_array_on(v, "、"))}
 
-        {:meaning = k, v} ->
+        {k, v} when k in [:meaning, :compact_meaning] ->
           {k, if(v, do: json_array_on(v, ";"))}
 
         other ->

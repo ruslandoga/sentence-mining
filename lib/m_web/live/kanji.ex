@@ -83,10 +83,14 @@ defmodule MWeb.KanjiLive do
           </div>
           <% end %>
 
-          <%= if @kanji.compact_meaning do %>
+          <%= if @kanji.compact_meaning && @kanji.compact_meaning != [] do %>
           <div>
             <dt class="inline text-sm text-gray-500 dark:text-gray-300">meanings:</dt>
-            <dd class="text-green-600 dark:text-green-300 inline"><%= String.replace(@kanji.compact_meaning, ";", ", ") %></dd>
+            <dd class="text-green-600 dark:text-green-300 inline">
+              <%= for meaning <- @kanji.compact_meaning do %>
+                <%= live_patch meaning, to: Routes.kanji_path(MWeb.Endpoint, :meaning, meaning), class: "hover:underline underline-offset-2 decoration-2" %>
+              <% end %>
+            </dd>
           </div>
           <% end %>
         </dl>
@@ -115,6 +119,7 @@ defmodule MWeb.KanjiLive do
         :phonetic -> Kanjis.fetch_kanjis_for(phonetic: word)
         :on -> Kanjis.fetch_kanjis_for_on(word)
         :kun -> Kanjis.fetch_kanjis_for_kun(word)
+        :meaning -> Kanjis.fetch_kanjis_for_meaning(word)
       end
 
     assign(socket, page_title: word, kanjis: kanjis)

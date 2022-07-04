@@ -23,6 +23,7 @@ defmodule MWeb.Router do
     live "/phonetic/:word", KanjiLive, :phonetic
     live "/on/:word", KanjiLive, :on
     live "/kun/:word", KanjiLive, :kun
+    live "/meaning/:word", KanjiLive, :meaning
   end
 
   scope "/api", MWeb do
