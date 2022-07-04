@@ -159,4 +159,80 @@ defmodule Dev do
     |> Enum.map(&String.trim/1)
     |> Jason.encode!()
   end
+
+  defmodule JLPTWord do
+    use Ecto.Schema
+
+    @primary_key false
+    schema "jlpt_words" do
+      field :expression, :string, primary_key: true
+      field :meaning, :string
+      field :reading, :string
+      field :level, :integer
+      field :tags, :string
+    end
+  end
+
+  # from http://www.tanos.co.uk/jlpt/
+  def load_tanos(path \\ Path.expand("~/Downloads")) do
+    # {count, _} = Repo.delete_all(JLPTWord)
+    # Logger.debug("deleted #{count} from jltp words")
+
+    data =
+      Enum.flat_map(1..5, fn level ->
+        path
+        |> Path.join("n#{level}-vocab-kanji-eng.csv")
+        |> File.read!()
+        |> NimbleCSV.RFC4180.parse_string(skip_headers: false)
+        |> Enum.map(fn [q, a] ->
+          %{
+            expression: extract_tanos(q),
+            meaning: extract_tanos(a),
+            level: level,
+            tags: "www.tanos.co.uk"
+          }
+        end)
+      end)
+
+    data
+    |> Enum.chunk_every(100)
+    |> Enum.each(fn chunk ->
+      {count, _} = Repo.insert_all(JLPTWord, chunk, on_conflict: :nothing)
+      Logger.debug("inserted #{count} into jlpt words")
+    end)
+  end
+
+  defp extract_tanos(html) do
+    html |> Floki.parse_fragment!() |> Floki.text()
+  end
+
+  # from https://github.com/jamsinclair/open-anki-jlpt-decks
+  # note https://github.com/jamsinclair/open-anki-jlpt-decks/issues/8
+  #  and https://github.com/jamsinclair/open-anki-jlpt-decks/pull/9
+  def load_open_anki_jlpt_decks(path \\ Path.expand("~/Downloads/open-anki-jlpt-decks/src")) do
+    {count, _} = Repo.delete_all(JLPTWord)
+    Logger.debug("deleted #{count} from jltp words")
+
+    data =
+      Enum.flat_map(1..5, fn level ->
+        path
+        |> Path.join("n#{level}.csv")
+        |> File.read!()
+        |> NimbleCSV.RFC4180.parse_string(skip_headers: true)
+        |> Enum.flat_map(fn [expression, reading, meaning, tags] ->
+          for expression <- String.split(expression, ";", trim: true) do
+            %{expression: expression, reading: reading, meaning: meaning, tags: tags}
+          end
+        end)
+      end)
+
+    data
+    |> Enum.chunk_every(100)
+    |> Enum.each(fn chunk ->
+      {count, _} =
+        Repo.insert_all(JLPTWord, chunk, on_conflict: {:replace, [:meaning, :reading, :tags]})
+
+      Logger.debug("inserted #{count} into jlpt words")
+    end)
+  end
 end
