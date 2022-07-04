@@ -27,11 +27,7 @@ defmodule MWeb.KanjiLive do
         _other -> nil
       end
 
-    # TOOD move to preprocessor
-    ons = (kanji.reg_on || "") |> String.split("、", trim: true) |> Enum.map(&String.trim/1)
-    kuns = (kanji.reg_kun || "") |> String.split("、", trim: true) |> Enum.map(&String.trim/1)
-
-    assigns = assign(assigns, jlpt: jlpt, ons: ons, kuns: kuns)
+    assigns = assign(assigns, jlpt: jlpt)
 
     ~H"""
     <div class="p-2 w-full md:w-1/2 lg:w-1/3">
@@ -65,23 +61,23 @@ defmodule MWeb.KanjiLive do
           </div>
           <% end %>
 
-          <%= if @kanji.reg_on do %>
+          <%= if @kanji.reg_on && @kanji.reg_on != [] do %>
           <div>
             <dt class="inline text-sm text-gray-500 dark:text-gray-300">on:</dt>
             <dd class="text-yellow-600 dark:text-yellow-300 inline">
-              <%= for on <- @ons do %>
+              <%= for on <- @kanji.reg_on do %>
                 <%= live_patch on, to: Routes.kanji_path(MWeb.Endpoint, :on, trim_on(on)), class: "hover:underline underline-offset-2 decoration-2" %>
               <% end %>
             </dd>
           </div>
           <% end %>
 
-          <%= if @kanji.reg_kun do %>
+          <%= if @kanji.reg_kun && @kanji.reg_kun != [] do %>
           <div>
             <dt class="inline text-sm text-gray-500 dark:text-gray-300">kun:</dt>
             <dd class="text-red-600 dark:text-red-300 inline">
-              <%= for kun <- @kuns do %>
-                <%= live_patch kun, to: Routes.kanji_path(MWeb.Endpoint, :kun, trim_kun(kun)), class: "hover:underline underline-offset-2 decoration-2" %>
+              <%= for kun <- @kanji.reg_kun do %>
+                <%= live_patch kun, to: Routes.kanji_path(MWeb.Endpoint, :kun, trim_on(trim_kun(kun))), class: "hover:underline underline-offset-2 decoration-2" %>
               <% end %>
             </dd>
           </div>
@@ -117,9 +113,8 @@ defmodule MWeb.KanjiLive do
         :word -> Kanjis.fetch_kanjis_for_word(word)
         :radical -> Kanjis.fetch_kanjis_for(radical: word)
         :phonetic -> Kanjis.fetch_kanjis_for(phonetic: word)
-        # :on -> Kanjis.fetch_kanjis_for_on(word)
-        :on -> Kanjis.fetch_kanjis_like(:reg_on, word)
-        :kun -> Kanjis.fetch_kanjis_like(:reg_kun, word)
+        :on -> Kanjis.fetch_kanjis_for_on(word)
+        :kun -> Kanjis.fetch_kanjis_for_kun(word)
       end
 
     assign(socket, page_title: word, kanjis: kanjis)
