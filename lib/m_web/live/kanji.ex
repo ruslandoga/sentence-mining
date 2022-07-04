@@ -12,15 +12,13 @@ defmodule MWeb.KanjiLive do
     <div class="p-4 max-w-screen-xl mx-auto">
       <div class="text-3xl text-center"><%= @word %></div>
       <div class="mt-4 flex -mx-2 flex-wrap">
-      <%= for kanji <- @kanjis do %>
-        <.kanji_info kanji={kanji} />
-      <% end %>
+      <%= for kanji <- @kanjis do %><.kanji_card kanji={kanji} /><% end %>
       </div>
     </div>
     """
   end
 
-  defp kanji_info(%{kanji: kanji} = assigns) do
+  defp kanji_card(%{kanji: kanji} = assigns) do
     jlpt =
       case kanji.jlpt_full do
         <<level::2-bytes, _rest::bytes>> -> level
@@ -45,56 +43,52 @@ defmodule MWeb.KanjiLive do
         </h3>
 
         <dl class="mt-2">
-          <div>
-            <dt class="inline text-sm text-gray-500 dark:text-gray-300">radical:</dt>
-            <%= live_patch to: Routes.kanji_path(MWeb.Endpoint, :radical, @kanji.radical) do %>
-              <dd class="text-green-600 dark:text-green-300 inline hover:underline underline-offset-2 decoration-2"><%= @kanji.radical %><%= if @kanji.radvar do %> (<%= @kanji.radvar %>)<% end %></dd>
+          <.info_point title="radical" color="text-green-600 dark:text-green-300">
+            <%= live_patch to: Routes.kanji_path(MWeb.Endpoint, :radical, @kanji.radical), class: "hover:underline underline-offset-2 decoration-2" do %>
+              <%= @kanji.radical %><%= if @kanji.radvar do %> (<%= @kanji.radvar %>)<% end %>
             <% end %>
-          </div>
+          </.info_point>
 
           <%= if @kanji.phonetic do %>
-          <div>
-            <dt class="inline text-sm text-gray-500 dark:text-gray-300">phonetic:</dt>
-            <%= live_patch to: Routes.kanji_path(MWeb.Endpoint, :phonetic, @kanji.phonetic) do %>
-              <dd class="text-sky-600 dark:text-sky-300 inline hover:underline underline-offset-2 decoration-2"><%= @kanji.phonetic %></dd>
-            <% end %>
-          </div>
+          <.info_point title="phonetic" color="text-sky-600 dark:text-sky-300">
+            <%= live_patch @kanji.phonetic, to: Routes.kanji_path(MWeb.Endpoint, :phonetic, @kanji.phonetic), class: "hover:underline underline-offset-2 decoration-2" %>
+          </.info_point>
           <% end %>
 
           <%= if @kanji.reg_on && @kanji.reg_on != [] do %>
-          <div>
-            <dt class="inline text-sm text-gray-500 dark:text-gray-300">on:</dt>
-            <dd class="text-yellow-600 dark:text-yellow-300 inline">
-              <%= for on <- @kanji.reg_on do %>
-                <%= live_patch on, to: Routes.kanji_path(MWeb.Endpoint, :on, trim_on(on)), class: "hover:underline underline-offset-2 decoration-2" %>
-              <% end %>
-            </dd>
-          </div>
+          <.info_point title="on" color="text-green-600 dark:text-green-300">
+            <%= for on <- @kanji.reg_on do %>
+              <%= live_patch on, to: Routes.kanji_path(MWeb.Endpoint, :on, trim_on(on)), class: "hover:underline underline-offset-2 decoration-2" %>
+            <% end %>
+          </.info_point>
           <% end %>
 
           <%= if @kanji.reg_kun && @kanji.reg_kun != [] do %>
-          <div>
-            <dt class="inline text-sm text-gray-500 dark:text-gray-300">kun:</dt>
-            <dd class="text-red-600 dark:text-red-300 inline">
-              <%= for kun <- @kanji.reg_kun do %>
-                <%= live_patch kun, to: Routes.kanji_path(MWeb.Endpoint, :kun, trim_on(trim_kun(kun))), class: "hover:underline underline-offset-2 decoration-2" %>
-              <% end %>
-            </dd>
-          </div>
+          <.info_point title="kun" color="text-green-600 dark:text-green-300">
+            <%= for kun <- @kanji.reg_kun do %>
+              <%= live_patch kun, to: Routes.kanji_path(MWeb.Endpoint, :kun, trim_on(trim_kun(kun))), class: "hover:underline underline-offset-2 decoration-2" %>
+            <% end %>
+          </.info_point>
           <% end %>
 
           <%= if @kanji.compact_meaning && @kanji.compact_meaning != [] do %>
-          <div>
-            <dt class="inline text-sm text-gray-500 dark:text-gray-300">meanings:</dt>
-            <dd class="text-green-600 dark:text-green-300 inline">
-              <%= for meaning <- @kanji.compact_meaning do %>
-                <%= live_patch meaning, to: Routes.kanji_path(MWeb.Endpoint, :meaning, meaning), class: "hover:underline underline-offset-2 decoration-2" %>
-              <% end %>
-            </dd>
-          </div>
+          <.info_point title="meanings" color="text-green-600 dark:text-green-300">
+            <%= for meaning <- @kanji.compact_meaning do %>
+              <%= live_patch meaning, to: Routes.kanji_path(MWeb.Endpoint, :meaning, meaning), class: "hover:underline underline-offset-2 decoration-2" %>
+            <% end %>
+          </.info_point>
           <% end %>
         </dl>
       </div>
+    </div>
+    """
+  end
+
+  defp info_point(assigns) do
+    ~H"""
+    <div>
+      <dt class="inline text-sm text-gray-500 dark:text-gray-300"><%= @title %>:</dt>
+      <dd class={@color <> " inline"}><%= render_slot(@inner_block) %></dd>
     </div>
     """
   end
