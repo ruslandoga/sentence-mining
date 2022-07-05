@@ -37,6 +37,7 @@ defmodule MWeb.KanjiLive do
       end
 
     assigns = assign(assigns, jlpt: jlpt)
+    assigns = assign(assigns, meaning: kanji.compact_meaning || kanji.meaning)
 
     ~H"""
     <div class="p-2 w-full md:w-1/2 lg:w-1/3">
@@ -82,9 +83,9 @@ defmodule MWeb.KanjiLive do
           </.info_point>
           <% end %>
 
-          <%= if @kanji.compact_meaning && @kanji.compact_meaning != [] do %>
+          <%= if @meaning && @meaning != [] do %>
           <.info_point title="meanings" color="text-green-600 dark:text-green-300">
-            <%= for meaning <- @kanji.compact_meaning do %>
+            <%= for meaning <- @meaning do %>
               <%= live_patch meaning, to: Routes.kanji_path(MWeb.Endpoint, :meaning, meaning), class: "hover:underline underline-offset-2 decoration-2" %>
             <% end %>
           </.info_point>

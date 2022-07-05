@@ -13,6 +13,7 @@ defmodule M.Kanjis do
       field :radical, :string
       field :radvar, :string
       field :phonetic, :string
+      field :meaning, {:array, :string}
       field :compact_meaning, {:array, :string}
       field :reg_on, {:array, :string}
       field :reg_kun, {:array, :string}
