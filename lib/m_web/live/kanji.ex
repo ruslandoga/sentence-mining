@@ -68,7 +68,7 @@ defmodule MWeb.KanjiLive do
           <% end %>
 
           <%= if @kanji.reg_on && @kanji.reg_on != [] do %>
-          <.info_point title="on" color="text-green-600 dark:text-green-300">
+          <.info_point title="on" color="text-yellow-600 dark:text-yellow-300">
             <%= for on <- @kanji.reg_on do %>
               <%= live_patch on, to: Routes.kanji_path(MWeb.Endpoint, :on, trim_on(on)), class: "hover:underline underline-offset-2 decoration-2" %>
             <% end %>
@@ -76,7 +76,7 @@ defmodule MWeb.KanjiLive do
           <% end %>
 
           <%= if @kanji.reg_kun && @kanji.reg_kun != [] do %>
-          <.info_point title="kun" color="text-green-600 dark:text-green-300">
+          <.info_point title="kun" color="text-red-600 dark:text-red-300">
             <%= for kun <- @kanji.reg_kun do %>
               <%= live_patch kun, to: Routes.kanji_path(MWeb.Endpoint, :kun, trim_on(trim_kun(kun))), class: "hover:underline underline-offset-2 decoration-2" %>
             <% end %>
