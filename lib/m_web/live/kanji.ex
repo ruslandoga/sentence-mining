@@ -15,7 +15,6 @@ defmodule MWeb.KanjiLive do
       <%= if @word_info do %>
       <div class="mt-2 flex space-x-4 justify-center text-gray-400">
         <div class="text-green-600 dark:text-green-300"><%= @word_info.meaning %></div>
-        <div><%= @word_info.tags %></div>
       </div>
       <% end %>
 
