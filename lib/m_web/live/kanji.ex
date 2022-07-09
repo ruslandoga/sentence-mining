@@ -128,7 +128,7 @@ defmodule MWeb.KanjiLive do
 
   defp link(assigns) do
     ~H"""
-    <a class={@class} data-phx-link="patch" data-phx-link-state="push" href={@href}><%= render_slot(@inner_block) %></a>
+    <a class={@class} data-phx-link="redirect" data-phx-link-state="push" href={@href}><%= render_slot(@inner_block) %></a>
     """
   end
 
