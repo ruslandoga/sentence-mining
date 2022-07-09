@@ -140,6 +140,9 @@ defmodule M.Longman do
       {:entries, {:ok, %Finch.Response{status: 302, headers: headers}}} ->
         http_get(fetch_location(headers), :suggestions)
 
+      {:entries, {:ok, %Finch.Response{status: 404}}} ->
+        {:error, "not found"}
+
       {:suggestions, {:ok, %Finch.Response{status: 200, body: body}}} ->
         {:suggestions, parse_suggestions(body)}
     end

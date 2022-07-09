@@ -123,6 +123,9 @@ defmodule M.Bot do
                   """ <> Enum.join(suggestions_cmds, "\n")
 
                 post_message(chat_id, message)
+
+              {:error, reason} ->
+                post_message(chat_id, word <> " (" <> to_string(source) <> "): " <> reason)
             end
           end
       end
