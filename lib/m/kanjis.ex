@@ -56,6 +56,7 @@ defmodule M.Kanjis do
       on: j.value == ^kun or j.value == ^star(kun) or like(j.value, ^with_bracket)
     )
     |> where([k], not is_nil(k.jlpt_full))
+    |> distinct(true)
     |> Repo.all()
   end
 
@@ -63,6 +64,7 @@ defmodule M.Kanjis do
     Kanji
     |> join(:inner, [k], j in json_each(k.reg_on), on: j.value == ^on or j.value == ^star(on))
     |> where([k], not is_nil(k.jlpt_full))
+    |> distinct(true)
     |> Repo.all()
   end
 
@@ -72,6 +74,7 @@ defmodule M.Kanjis do
       on: j.value == ^meaning
     )
     |> where([k], not is_nil(k.jlpt_full))
+    |> distinct(true)
     |> Repo.all()
   end
 
