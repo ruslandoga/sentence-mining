@@ -68,7 +68,9 @@ defmodule M.Kanjis do
 
   def fetch_kanjis_for_meaning(meaning) do
     Kanji
-    |> join(:inner, [k], j in json_each(k.compact_meaning), on: j.value == ^meaning)
+    |> join(:inner, [k], j in json_each(coalesce(k.compact_meaning, k.meaning)),
+      on: j.value == ^meaning
+    )
     |> where([k], not is_nil(k.jlpt_full))
     |> Repo.all()
   end
