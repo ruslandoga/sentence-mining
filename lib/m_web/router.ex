@@ -24,6 +24,7 @@ defmodule MWeb.Router do
     live "/on/:word", KanjiLive, :on
     live "/kun/:word", KanjiLive, :kun
     live "/meaning/:word", KanjiLive, :meaning
+    live "/sentence/:sentence", SentenceLive, :sentence
   end
 
   scope "/api", MWeb do

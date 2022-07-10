@@ -111,4 +111,46 @@ defmodule M.Kanjis do
     |> where(expression: ^word)
     |> Repo.one()
   end
+
+  # TODO use nimble_pool of ports
+  def segment_sentence(sentence) do
+    # for now based on https://github.com/tex2e/mecab-elixir/blob/master/lib/mecab.ex
+    command = """
+    cat <<'EOS.907a600613b96a88c04a' | mecab
+    #{sentence}
+    EOS.907a600613b96a88c04a
+    """
+
+    command
+    |> to_charlist
+    |> :os.cmd()
+    |> to_string
+    |> String.trim()
+    |> String.split("\n")
+    |> Enum.map(fn line ->
+      Regex.named_captures(
+        ~r/
+          ^
+          (?<surface_form>[^\t]+)
+          (?:
+            \s
+            (?<part_of_speech>[^,]+),
+            \*?(?<part_of_speech_subcategory1>[^,]*),
+            \*?(?<part_of_speech_subcategory2>[^,]*),
+            \*?(?<part_of_speech_subcategory3>[^,]*),
+            \*?(?<conjugation_form>[^,]*),
+            \*?(?<conjugation>[^,]*),
+            (?<lexical_form>[^,]*)
+            (?:
+              ,(?<yomi>[^,]*)
+              ,(?<pronunciation>[^,]*)
+            )?
+          )?
+          $
+          /x,
+        line
+      )
+    end)
+    |> List.delete_at(-1)
+  end
 end
