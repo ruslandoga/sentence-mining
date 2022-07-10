@@ -38,6 +38,7 @@ defmodule MWeb.SentenceLive do
   defp segment_class(%{"part_of_speech" => "助詞"}), do: "text-red-400"
   defp segment_class(%{"part_of_speech" => "動詞"}), do: "text-green-400"
   defp segment_class(%{"part_of_speech" => "形容詞"}), do: "text-pink-400"
+  defp segment_class(%{"part_of_speech" => "連体詞"}), do: "text-pink-400"
   defp segment_class(%{"part_of_speech" => "助動詞"}), do: "text-yellow-400"
   defp segment_class(%{"part_of_speech" => "副詞"}), do: "text-sky-400"
   defp segment_class(%{"part_of_speech" => "記号"}), do: "text-gray-400"
@@ -48,6 +49,7 @@ defmodule MWeb.SentenceLive do
   defp part_of_speech_eng("形容詞"), do: "adjective"
   defp part_of_speech_eng("助動詞"), do: "auxiliary verb"
   defp part_of_speech_eng("副詞"), do: "adverb"
+  defp part_of_speech_eng("連体詞"), do: "adnominal adjective"
   defp part_of_speech_eng(_other), do: nil
 
   defp tippy(%{"part_of_speech" => part_of_speech, "lexical_form" => lexical_form, "word" => word}) do
