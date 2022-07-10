@@ -9,7 +9,25 @@ let csrfToken = document
   .querySelector("meta[name='csrf-token']")
   .getAttribute("content");
 
+import tippy from "tippy.js";
+
+const TippyHook = {
+  mounted() {
+    const info = JSON.parse(this.el.dataset.tippy);
+    let content = `<p class="font-semibold">${info.part_of_speech}</p>`;
+
+    if (info.word) {
+      content =
+        content +
+        `<div class="mt-2"><span>${info.lexical_form}: </span><span>${info.word.meaning}</span></div>`;
+    }
+
+    tippy(this.el, { content, allowHTML: true });
+  },
+};
+
 let liveSocket = new LiveSocket("/live", Socket, {
+  hooks: { TippyHook },
   params: { _csrf_token: csrfToken },
 });
 

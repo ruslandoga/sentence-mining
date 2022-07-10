@@ -5,6 +5,12 @@
 FROM litestream/litestream:0.3.8 AS litestream
 
 #########
+# MECAB #
+#########
+
+FROM ghcr.io/ruslandoga/mecab-alpine:master AS mecab
+
+#########
 # BUILD #
 #########
 
@@ -56,6 +62,7 @@ USER nobody:nobody
 
 COPY --from=build --chown=nobody:nobody /app/_build/prod/rel/m ./
 COPY --from=litestream /usr/local/bin/litestream /usr/local/bin/litestream
+COPY --from=mecab /usr/local /usr/local
 COPY litestream.yml /etc/litestream.yml
 
 ENV HOME=/app
