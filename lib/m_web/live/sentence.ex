@@ -54,7 +54,11 @@ defmodule MWeb.SentenceLive do
     if part_of_speech = part_of_speech_eng(part_of_speech) do
       data =
         if word do
-          %{"part_of_speech" => part_of_speech, "lexical_form" => lexical_form, "word" => word}
+          %{
+            "part_of_speech" => part_of_speech,
+            "lexical_form" => lexical_form,
+            "word" => Map.take(word, [:meaning, :reading])
+          }
         else
           %{"part_of_speech" => part_of_speech}
         end
