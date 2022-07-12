@@ -36,7 +36,7 @@ defmodule MWeb.SentenceLive do
 
     ~H"""
     <span id={"segment-#{@id}"} class={@segment_class} data-template={"tippy-#{@id}"} phx-hook="TippyHook"><%= @surface_form %></span>
-    <%= if @part_of_speech do %><template id={"tippy-#{@id}"}><.tippy_content part_of_speech={@part_of_speech} lexical_form={@lexical_form} entry={@entry} /></template><% end %>
+    <%= if @part_of_speech && @entry do %><template id={"tippy-#{@id}"}><.tippy_content part_of_speech={@part_of_speech} lexical_form={@lexical_form} entry={@entry} /></template><% end %>
     """
   end
 
