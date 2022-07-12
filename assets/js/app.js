@@ -13,16 +13,16 @@ import tippy from "tippy.js";
 
 const TippyHook = {
   mounted() {
-    const info = JSON.parse(this.el.dataset.tippy);
-    let content = `<p class="font-semibold">${info.part_of_speech}</p>`;
+    const templateId = this.el.dataset.template;
+    const template = document.getElementById(templateId);
 
-    if (info.word) {
-      content =
-        content +
-        `<div class="mt-2"><span>${info.lexical_form}: </span><span>${info.word.meaning}</span></div>`;
+    if (template) {
+      const content = template.content.cloneNode(true);
+
+      if (content) {
+        tippy(this.el, { content, allowHTML: true, interactive: true });
+      }
     }
-
-    tippy(this.el, { content, allowHTML: true });
   },
 };
 

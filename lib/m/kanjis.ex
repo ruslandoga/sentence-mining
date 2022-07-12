@@ -1,6 +1,6 @@
 defmodule M.Kanjis do
   import Ecto.Query
-  alias M.Repo
+  alias M.{Repo, JMDictRepo}
 
   defmodule Kanji do
     use Ecto.Schema
@@ -99,21 +99,57 @@ defmodule M.Kanjis do
     end
   end
 
-  def list_words do
+  def jlpt_list_words do
     JLPTWord
     |> order_by([w], desc: w.level)
     |> limit(20)
     |> Repo.all()
   end
 
-  def get_word(word) do
+  def jlpt_get_word(word) do
     JLPTWord
     |> where(expression: ^word)
     |> Repo.one()
   end
 
+  defmacrop json(value) do
+    quote do
+      fragment("json(?)", unquote(value))
+    end
+  end
+
+  defmacrop json_group_array(value) do
+    quote do
+      fragment("json_group_array(?)", unquote(value))
+    end
+  end
+
+  # https://github.com/ruslandoga/jp-sqlite
+  def jmdict_get_word(word) when is_binary(word) do
+    json_entries =
+      "lookup"
+      |> where(expression: ^word)
+      |> join(:inner, [l], e in "entries", on: l.id == e.id)
+      |> select([l, e], json_group_array(json(e.entry)))
+      |> JMDictRepo.one()
+
+    if json_entries do
+      Jason.decode!(json_entries)
+    end
+  end
+
+  def jmdict_get_words(words) when is_list(words) do
+    "lookup"
+    |> where([l], l.expression in ^words)
+    |> join(:inner, [l], e in "entries", on: l.id == e.id)
+    |> select([l, e], {l.expression, json_group_array(json(e.entry))})
+    |> group_by([l], l.expression)
+    |> JMDictRepo.all()
+    |> Map.new(fn {_, v} = t -> put_elem(t, 1, Jason.decode!(v)) end)
+  end
+
   # TODO use nimble_pool of ports
-  def segment_sentence(sentence) do
+  def segment_sentence(sentence, opts \\ []) do
     # for now based on https://github.com/tex2e/mecab-elixir/blob/master/lib/mecab.ex
     command = """
     cat <<'EOS.907a600613b96a88c04a' | mecab
@@ -121,15 +157,16 @@ defmodule M.Kanjis do
     EOS.907a600613b96a88c04a
     """
 
-    command
-    |> to_charlist
-    |> :os.cmd()
-    |> to_string
-    |> String.trim()
-    |> String.split("\n")
-    |> Enum.map(fn line ->
-      Regex.named_captures(
-        ~r/
+    segments =
+      command
+      |> to_charlist
+      |> :os.cmd()
+      |> to_string
+      |> String.trim()
+      |> String.split("\n")
+      |> Enum.map(fn line ->
+        Regex.named_captures(
+          ~r/
           ^
           (?<surface_form>[^\t]+)
           (?:
@@ -148,9 +185,20 @@ defmodule M.Kanjis do
           )?
           $
           /x,
-        line
-      )
-    end)
-    |> List.delete_at(-1)
+          line
+        )
+      end)
+      |> List.delete_at(-1)
+
+    if opts[:entry] do
+      words = Enum.map(segments, fn %{"lexical_form" => word} -> word end)
+      jmdict_words = jmdict_get_words(words)
+
+      Enum.map(segments, fn %{"lexical_form" => word} = segment ->
+        Map.put(segment, "entry", jmdict_words[word])
+      end)
+    else
+      segments
+    end
   end
 end

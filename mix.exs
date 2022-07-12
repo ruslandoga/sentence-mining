@@ -61,7 +61,8 @@ defmodule M.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "ecto.setup"],
+      setup: ["deps.get", "ecto.setup", "jmdict"],
+      jmdict: ["cmd bin/jmdict.sh"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       sentry_recompile: ["compile", "deps.compile sentry --force"],
