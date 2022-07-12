@@ -8,7 +8,7 @@ FROM litestream/litestream:0.3.8 AS litestream
 # MECAB #
 #########
 
-FROM ghcr.io/ruslandoga/mecab-alpine:master AS mecab
+FROM ghcr.io/ruslandoga/mecab-alpine:mecab AS mecab
 
 ##########
 # JMDICT #

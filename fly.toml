@@ -13,6 +13,7 @@ processes = []
   DB_PATH = "/data/m_prod.db"
   PHX_SERVER = "true"
   PHX_HOST = "words.edify.space"
+  JMDICT_DB_PATH = "/app/jmdict.db"
 
 [experimental]
   allowed_public_ports = []
