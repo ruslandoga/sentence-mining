@@ -136,7 +136,7 @@ defmodule MWeb.KanjiLive do
 
   @impl true
   def handle_params(%{"word" => word}, _uri, socket) do
-    word_info = Kanjis.get_word(word)
+    word_info = Kanjis.jlpt_get_word(word)
 
     socket =
       socket
@@ -147,7 +147,7 @@ defmodule MWeb.KanjiLive do
   end
 
   def handle_params(_params, _uri, socket) do
-    words = Kanjis.list_words()
+    words = Kanjis.jlpt_list_words()
     socket = assign(socket, word: nil, word_info: nil, page_title: "", kanjis: [], words: words)
     {:noreply, socket}
   end

@@ -5,6 +5,11 @@ config :m, M.Repo,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true
 
+config :m, M.JMDictRepo,
+  pool_size: 5,
+  stacktrace: true,
+  show_sensitive_data_on_connection_error: true
+
 config :m, MWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.

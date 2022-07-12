@@ -13,6 +13,16 @@ config :sentry,
   environment_name: config_env(),
   included_environments: [:prod]
 
+jmdict_db_path =
+  System.get_env("JMDICT_DB_PATH") || Path.expand("../jmdict.db", Path.dirname(__ENV__.file))
+
+if File.exists?(jmdict_db_path) do
+  config :m, M.JMDictRepo,
+    database: jmdict_db_path,
+    pool_size: String.to_integer(System.get_env("JMDICT_POOL_SIZE") || "5"),
+    cache_size: -2000
+end
+
 # ## Using releases
 #
 # If you use `mix release`, you need to explicitly enable the server

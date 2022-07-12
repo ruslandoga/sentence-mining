@@ -10,6 +10,16 @@ FROM litestream/litestream:0.3.8 AS litestream
 
 FROM ghcr.io/ruslandoga/mecab-alpine:master AS mecab
 
+##########
+# JMDICT #
+##########
+
+FROM alpine:3.16.0 AS jmdict
+
+# TODO lz4
+RUN apk add --no-cache --update curl
+RUN curl 'https://github.com/ruslandoga/jp-sqlite/releases/download/jmdict/jmdict.db' -LO
+
 #########
 # BUILD #
 #########
@@ -60,9 +70,10 @@ WORKDIR /app
 RUN chown nobody:nobody /app
 USER nobody:nobody
 
-COPY --from=build --chown=nobody:nobody /app/_build/prod/rel/m ./
 COPY --from=litestream /usr/local/bin/litestream /usr/local/bin/litestream
 COPY --from=mecab /usr/local /usr/local
+COPY --from=jmdict --chown=nobody:nobody /jmdict.db ./
+COPY --from=build --chown=nobody:nobody /app/_build/prod/rel/m ./
 COPY litestream.yml /etc/litestream.yml
 
 ENV HOME=/app
