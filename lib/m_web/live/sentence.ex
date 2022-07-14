@@ -1,5 +1,6 @@
 defmodule MWeb.SentenceLive do
   use MWeb, :live_view
+  require Logger
 
   @impl true
   def mount(_params, _session, socket) do
@@ -105,7 +106,13 @@ defmodule MWeb.SentenceLive do
   defp segment_class(%{"part_of_speech" => "連体詞"}), do: "text-pink-400"
   defp segment_class(%{"part_of_speech" => "助動詞"}), do: "text-yellow-400"
   defp segment_class(%{"part_of_speech" => "副詞"}), do: "text-sky-400"
+  defp segment_class(%{"part_of_speech" => "フィラー"}), do: "text-gray-400"
   defp segment_class(%{"part_of_speech" => "記号"}), do: "text-gray-400"
+
+  defp segment_class(%{"part_of_speech" => other}) do
+    Logger.error("unexpected part_of_speech: #{other}")
+    "text-gray-400"
+  end
 
   defp part_of_speech_eng("名詞"), do: "noun"
   defp part_of_speech_eng("助詞"), do: "particle"
