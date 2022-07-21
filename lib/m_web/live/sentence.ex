@@ -55,7 +55,8 @@ defmodule MWeb.SentenceLive do
   end
 
   defp filter_entry(entries, part_of_speech) do
-    entries
+    # TODO
+    (entries || [])
     |> Enum.reduce([], fn %{"sense" => senses} = entry, acc ->
       senses =
         Enum.filter(senses, fn %{"pos" => pos} ->
