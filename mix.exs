@@ -40,7 +40,7 @@ defmodule M.MixProject do
       {:ecto_sqlite3, "~> 0.8.0"},
       {:phoenix_html, "~> 3.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_view, "~> 0.17.5"},
+      {:phoenix_live_view, "~> 0.18.0"},
       {:floki, ">= 0.30.0"},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
