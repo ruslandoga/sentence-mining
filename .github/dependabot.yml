@@ -6,7 +6,7 @@
 version: 2
 updates:
   - package-ecosystem: "mix"
-    directory: "/" # Location of package manifests
+    directory: "/"
     schedule:
       interval: "daily"
 
