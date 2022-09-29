@@ -49,7 +49,7 @@ defmodule MWeb.SentenceLive do
     <div class="max-h-[35vh] overflow-auto">
       <div class="font-semibold p-1"><%= @part_of_speech %></div>
       <div class="p-1"><%= if @reading == @lexical_form or is_nil(@reading) do %><%= @lexical_form %><% else %><%= @lexical_form %> 【<%= @reading %>】<% end %></div>
-      <div class="p-1 pt-0"><%= for entry <- @entry do %><.entry_content entry={entry} /><% end %></div>
+      <div class="p-1 pt-0"><%= for subentry <- @entry do %><.entry_content entry={subentry} /><% end %></div>
     </div>
     """
   end
