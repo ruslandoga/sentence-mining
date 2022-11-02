@@ -43,9 +43,7 @@ defmodule MWeb do
 
   def live_view do
     quote do
-      use Phoenix.LiveView,
-        layout: {MWeb.LayoutView, :live}
-
+      use Phoenix.LiveView, layout: {MWeb.LayoutView, :live}
       unquote(view_helpers())
     end
   end
@@ -53,7 +51,6 @@ defmodule MWeb do
   def live_component do
     quote do
       use Phoenix.LiveComponent
-
       unquote(view_helpers())
     end
   end
@@ -61,7 +58,6 @@ defmodule MWeb do
   def component do
     quote do
       use Phoenix.Component
-
       unquote(view_helpers())
     end
   end
@@ -85,9 +81,7 @@ defmodule MWeb do
   defp view_helpers do
     quote do
       use Phoenix.HTML
-      import Phoenix.Component
-      import Phoenix.View
-
+      import Phoenix.{Component, View}
       import MWeb.ErrorHelpers
       alias MWeb.Router.Helpers, as: Routes
     end
