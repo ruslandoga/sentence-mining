@@ -44,7 +44,7 @@ defmodule MWeb do
   def live_view do
     quote do
       use Phoenix.LiveView,
-        layout: {MWeb.LayoutView, "live.html"}
+        layout: {MWeb.LayoutView, :live}
 
       unquote(view_helpers())
     end
