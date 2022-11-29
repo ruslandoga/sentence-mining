@@ -8,12 +8,12 @@ defmodule M.Sentences do
   @type entries :: %{{word, pronunciation} => [map]}
   @type source :: :longman | :britannica
 
-  def recent_words_csv(user_id, sources) do
-    pmap(sources, :recent_words_csv, [user_id])
+  def recent_words_csv_stream(user_id, sources) do
+    pmap(sources, :recent_words_csv_stream, [user_id])
   end
 
-  def all_words_csv(user_id, sources) do
-    pmap(sources, :all_words_csv, [user_id])
+  def all_words_csv_stream(user_id, sources) do
+    pmap(sources, :all_words_csv_stream, [user_id])
   end
 
   def count_words(user_id, sources) do
@@ -48,8 +48,8 @@ defmodule M.Sentences do
     handler(source).save_entries(user_id, entries)
   end
 
-  def dump_to_csv(source, entries, opts) do
-    handler(source).dump_to_csv(entries, opts)
+  def dump_to_csv_stream(source, entries, opts) do
+    handler(source).dump_to_csv_stream(entries, opts)
   end
 
   @spec handler(source) :: module

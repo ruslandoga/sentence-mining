@@ -21,39 +21,39 @@ defmodule M.Britannica do
   end
 
   @impl true
-  def all_words_csv(user_id) do
+  def all_words_csv_stream(user_id) do
     Word
     |> where(user_id: ^user_id)
     |> select([w], {{w.word, w.pronunciation}, w.senses, w.inserted_at})
-    |> Repo.all()
-    |> dump_to_csv()
+    |> Repo.stream(max_rows: 30)
+    |> dump_to_csv_stream()
   end
 
   # TODO proper localization
   @impl true
-  def recent_words_csv(user_id, reference \\ DateTime.utc_now()) do
+  def recent_words_csv_stream(user_id, reference \\ DateTime.utc_now()) do
     day_ago = DateTime.add(reference, -24 * 3600)
 
     Word
     |> where(user_id: ^user_id)
     |> where([w], w.updated_at >= ^day_ago)
     |> select([w], {{w.word, w.pronunciation}, w.senses, w.inserted_at})
-    |> Repo.all()
-    |> dump_to_csv()
+    |> Repo.stream(max_rows: 30)
+    |> dump_to_csv_stream()
   end
 
   @impl true
-  def dump_to_csv(entries, opts \\ [first: true]) do
-    CSV.dump_to_iodata(to_csv_rows(entries, opts))
+  def dump_to_csv_stream(entries, opts \\ [first: true]) do
+    CSV.dump_to_stream(to_csv_rows_stream(entries, opts))
   end
 
   @impl true
   def save_entries(user_id, entries) do
     now = NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
 
-    to_insert =
+    words =
       Enum.map(entries, fn {{word, pronunciation}, senses} ->
-        %{
+        %Word{
           user_id: user_id,
           word: word,
           pronunciation: pronunciation,
@@ -63,16 +63,20 @@ defmodule M.Britannica do
         }
       end)
 
-    Repo.insert_all(Word, to_insert,
-      on_conflict: {:replace, [:senses, :updated_at]},
-      conflict_target: [:user_id, :word, :pronunciation]
-    )
+    Repo.transaction(fn ->
+      for word <- words do
+        Repo.insert!(word,
+          on_conflict: {:replace, [:senses, :updated_at]},
+          conflict_target: [:user_id, :word, :pronunciation]
+        )
+      end
+    end)
 
     :ok
   end
 
-  defp to_csv_rows(entries, opts) do
-    Enum.flat_map(entries, &to_csv_row(&1, opts))
+  defp to_csv_rows_stream(entries, opts) do
+    Stream.flat_map(entries, &to_csv_row(&1, opts))
   end
 
   defp to_csv_row({{word, pronunciation}, senses}, opts) do

@@ -1,5 +1,5 @@
 defmodule M.Bot do
-  alias M.Sentences
+  alias M.{Sentences, Longman, Britannica}
   @adapter Application.compile_env!(:m, [__MODULE__, :adapter])
 
   defp config(key), do: config()[key]
@@ -18,8 +18,8 @@ defmodule M.Bot do
     @adapter.send_message(chat_id, text, opts)
   end
 
-  def post_document(chat_id, content, filename, content_type, opts \\ []) do
-    @adapter.send_document(chat_id, content, filename, content_type, opts)
+  def post_document(chat_id, stream, filename, content_type, opts \\ []) do
+    @adapter.send_document(chat_id, Stream.chunk_every(stream, 30), filename, content_type, opts)
   end
 
   def handle(%{
@@ -50,15 +50,19 @@ defmodule M.Bot do
   end
 
   defp handle_text("/today" <> _rest, %{chat_id: chat_id, from_id: from_id}) do
-    for {source, csv} <- Sentences.recent_words_csv(from_id, [:britannica, :longman]) do
-      post_document(chat_id, csv, "#{source}_today.csv", "text/csv")
-    end
+    longman_today = Longman.recent_words_csv_stream(from_id)
+    britannica_today = Britannica.recent_words_csv_stream(from_id)
+    # TODO send both at the same time
+    post_document(chat_id, longman_today, "longman_today.csv", "text/csv")
+    post_document(chat_id, britannica_today, "britannica_today.csv", "text/csv")
   end
 
   defp handle_text("/all" <> _rest, %{chat_id: chat_id, from_id: from_id}) do
-    for {source, csv} <- Sentences.all_words_csv(from_id, [:britannica, :longman]) do
-      post_document(chat_id, csv, "#{source}_all.csv", "text/csv")
-    end
+    longman_all = Longman.all_words_csv_stream(from_id)
+    britannica_all = Britannica.all_words_csv_stream(from_id)
+    # TODO send both at the same time
+    post_document(chat_id, longman_all, "longman_all.csv", "text/csv")
+    post_document(chat_id, britannica_all, "britannica_all.csv", "text/csv")
   end
 
   defp handle_text("/count" <> _rest, %{chat_id: chat_id, from_id: from_id}) do
@@ -104,8 +108,8 @@ defmodule M.Bot do
 
               {:entries, entries} ->
                 Sentences.save_entries(source, from_id, entries)
-                csv = Sentences.dump_to_csv(source, entries, first: false)
-                post_document(chat_id, csv, "#{source}_#{word}.csv", "text/csv")
+                csv_stream = Sentences.dump_to_csv_stream(source, entries, first: false)
+                post_document(chat_id, csv_stream, "#{source}_#{word}.csv", "text/csv")
 
               {:suggestions, suggestions} ->
                 suggestions_cmds =

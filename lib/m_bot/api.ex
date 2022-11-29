@@ -22,7 +22,7 @@ defmodule M.Bot.API do
 
   @impl true
   # https://core.telegram.org/bots/api#senddocument
-  def send_document(chat_id, content, filename, content_type, opts) do
+  def send_document(chat_id, stream, filename, content_type, opts) do
     payload = Enum.into(opts, %{"chat_id" => chat_id})
     boundary = Base.url_encode64(:crypto.strong_rand_bytes(9))
 
@@ -39,27 +39,27 @@ defmodule M.Bot.API do
         ]
       end)
 
-    file = [
-      "--",
-      boundary,
-      "\r\ncontent-disposition: form-data; name=\"document\"; filename=\"",
-      filename,
-      "\"\r\ncontent-type: ",
-      content_type,
-      "\r\n\r\n",
-      content,
-      "\r\n--",
-      boundary,
-      "--"
-    ]
-
-    multipart = [form | file]
+    multipart =
+      Stream.concat([
+        form,
+        [
+          "--",
+          boundary,
+          "\r\ncontent-disposition: form-data; name=\"document\"; filename=\"",
+          filename,
+          "\"\r\ncontent-type: ",
+          content_type,
+          "\r\n\r\n"
+        ],
+        stream,
+        ["\r\n--", boundary, "--"]
+      ])
 
     headers = [
       {"content-type", "multipart/form-data; boundary=" <> boundary}
     ]
 
-    request("sendDocument", headers, multipart)
+    request("sendDocument", headers, {:stream, multipart})
   end
 
   defp request(method, body) when is_map(body) do
