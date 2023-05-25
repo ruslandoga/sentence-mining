@@ -14,7 +14,7 @@ FROM ghcr.io/ruslandoga/mecab-alpine:mecab AS mecab
 # JMDICT #
 ##########
 
-FROM alpine:3.16.2 AS jmdict
+FROM alpine:3.18.0 AS jmdict
 
 # TODO lz4
 RUN apk add --no-cache --update curl
@@ -24,7 +24,7 @@ RUN curl 'https://github.com/ruslandoga/jp-sqlite/releases/download/jmdict/jmdic
 # BUILD #
 #########
 
-FROM hexpm/elixir:1.14.4-erlang-25.1.2-alpine-3.16.2 as build
+FROM hexpm/elixir:1.14.5-erlang-26.0-alpine-3.18.0 as build
 
 # install build dependencies
 RUN apk add --no-cache --update git build-base nodejs npm
@@ -62,7 +62,7 @@ RUN mix release
 # APP #
 #######
 
-FROM alpine:3.16.2 AS app
+FROM alpine:3.18.0 AS app
 RUN apk add --no-cache --update bash openssl libgcc libstdc++
 
 WORKDIR /app

@@ -1,15 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="csrf-token" content={csrf_token_value()}>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content={csrf_token_value()} />
     <.live_title><%= assigns[:page_title] || "words" %></.live_title>
-    <link phx-track-static rel="stylesheet" href={Routes.static_path(@conn, "/assets/app.css")}/>
-    <script defer phx-track-static type="text/javascript" src={Routes.static_path(@conn, "/assets/app.js")}></script>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇯🇵</text></svg>">
-    <script defer data-domain="words.edify.space" src="https://who.copycat.fun/js/plausible.js"></script>
+    <link phx-track-static rel="stylesheet" href={Routes.static_path(@conn, "/assets/app.css")} />
+    <script
+      defer
+      phx-track-static
+      type="text/javascript"
+      src={Routes.static_path(@conn, "/assets/app.js")}
+    >
+    </script>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇯🇵</text></svg>"
+    />
+    <script defer data-domain="words.edify.space" src="https://who.copycat.fun/js/plausible.js">
+    </script>
   </head>
   <body class="dark:bg-zinc-800 dark:text-gray-50">
     <%= @inner_content %>
