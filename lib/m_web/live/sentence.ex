@@ -12,7 +12,9 @@ defmodule MWeb.SentenceLive do
     ~H"""
     <div class="min-h-screen lg:flex lg:items-center lg:justify-center">
       <div class="text-2xl p-6 max-w-screen-xl mx-auto">
-        <%= for {segment, idx} <- Enum.with_index(@segments) do %><.segment id={idx} segment={segment} /><% end %>
+        <%= for {segment, idx} <- Enum.with_index(@segments) do %>
+          <.segment id={idx} segment={segment} />
+        <% end %>
       </div>
     </div>
     """
@@ -36,8 +38,19 @@ defmodule MWeb.SentenceLive do
       )
 
     ~H"""
-    <span id={"segment-#{@id}"} class={@segment_class} data-template={"tippy-#{@id}"} phx-hook="TippyHook"><%= @surface_form %></span>
-    <%= if @part_of_speech && @entry do %><template id={"tippy-#{@id}"}><.tippy_content part_of_speech={@part_of_speech} lexical_form={@lexical_form} entry={@entry} /></template><% end %>
+    <span
+      id={"segment-#{@id}"}
+      class={@segment_class}
+      data-template={"tippy-#{@id}"}
+      phx-hook="TippyHook"
+    >
+      <%= @surface_form %>
+    </span>
+    <%= if @part_of_speech && @entry do %>
+      <template id={"tippy-#{@id}"}>
+        <.tippy_content part_of_speech={@part_of_speech} lexical_form={@lexical_form} entry={@entry} />
+      </template>
+    <% end %>
     """
   end
 
@@ -48,8 +61,18 @@ defmodule MWeb.SentenceLive do
     ~H"""
     <div class="max-h-[35vh] overflow-auto">
       <div class="font-semibold p-1"><%= @part_of_speech %></div>
-      <div class="p-1"><%= if @reading == @lexical_form or is_nil(@reading) do %><%= @lexical_form %><% else %><%= @lexical_form %> 【<%= @reading %>】<% end %></div>
-      <div class="p-1 pt-0"><%= for subentry <- @entry do %><.entry_content entry={subentry} /><% end %></div>
+      <div class="p-1">
+        <%= if @reading == @lexical_form or is_nil(@reading) do %>
+          <%= @lexical_form %>
+        <% else %>
+          <%= @lexical_form %> 【<%= @reading %>】
+        <% end %>
+      </div>
+      <div class="p-1 pt-0">
+        <%= for subentry <- @entry do %>
+          <.entry_content entry={subentry} />
+        <% end %>
+      </div>
     </div>
     """
   end
@@ -78,7 +101,11 @@ defmodule MWeb.SentenceLive do
     ~H"""
     <ul class="list-disc px-4">
       <%= for meanings <- @meanings do %>
-        <li><%= for meaning <- Enum.intersperse(meanings, "; ") do %><%= meaning %><% end %></li>
+        <li>
+          <%= for meaning <- Enum.intersperse(meanings, "; ") do %>
+            <%= meaning %>
+          <% end %>
+        </li>
       <% end %>
     </ul>
     """
