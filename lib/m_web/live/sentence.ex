@@ -11,7 +11,7 @@ defmodule MWeb.SentenceLive do
   def render(assigns) do
     ~H"""
     <div class="min-h-screen lg:flex lg:items-center lg:justify-center">
-      <div class="text-2xl p-6 max-w-screen-xl mx-auto">
+      <div class="text-2xl p-6 flex max-w-screen-xl mx-auto">
         <%= for {segment, idx} <- Enum.with_index(@segments) do %>
           <.segment id={idx} segment={segment} />
         <% end %>
@@ -40,7 +40,7 @@ defmodule MWeb.SentenceLive do
     ~H"""
     <span
       id={"segment-#{@id}"}
-      class={@segment_class}
+      class={"px-0.5 " <> @segment_class}
       data-template={"tippy-#{@id}"}
       phx-hook="TippyHook"
     >
