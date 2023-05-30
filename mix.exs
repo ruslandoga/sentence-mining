@@ -41,7 +41,7 @@ defmodule M.MixProject do
       {:phoenix_html, "~> 3.0"},
       {:phoenix_view, "~> 2.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_view, "~> 0.18.0"},
+      {:phoenix_live_view, "~> 0.19.0"},
       {:floki, ">= 0.30.0"},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
