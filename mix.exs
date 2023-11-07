@@ -37,11 +37,11 @@ defmodule M.MixProject do
       {:phoenix, "~> 1.7.2"},
       {:phoenix_ecto, "~> 4.4"},
       {:ecto_sql, "~> 3.6"},
-      {:ecto_sqlite3, "~> 0.10.0"},
+      {:ecto_sqlite3, "~> 0.12.0"},
       {:phoenix_html, "~> 3.0"},
       {:phoenix_view, "~> 2.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_view, "~> 0.19.0"},
+      {:phoenix_live_view, "~> 0.20.1"},
       {:floki, ">= 0.30.0"},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
@@ -49,7 +49,7 @@ defmodule M.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:finch, "~> 0.10"},
       {:nimble_csv, "~> 1.2"},
-      {:sentry, "~> 8.0"},
+      {:sentry, "~> 9.1.0"},
       {:rexbug, "~> 1.0"}
     ]
   end
