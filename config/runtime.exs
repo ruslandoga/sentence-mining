@@ -88,7 +88,7 @@ if config_env() == :dev do
 end
 
 if config_env() == :test do
-  config :logger, level: :warn
+  config :logger, level: :warning
   config :m, M.Repo, database: :memory
   config :m, MWeb.Endpoint, http: [ip: {127, 0, 0, 1}, port: 4002]
 end

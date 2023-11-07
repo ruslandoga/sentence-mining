@@ -1,6 +1,6 @@
 import Config
 
-config :logger, level: :warn
+config :logger, level: :warning
 config :m, M.Bot, adapter: M.Bot.API
 config :phoenix, :plug_init_mode, :runtime
 
