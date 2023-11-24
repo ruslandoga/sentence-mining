@@ -49,7 +49,7 @@ defmodule M.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:finch, "~> 0.10"},
       {:nimble_csv, "~> 1.2"},
-      {:sentry, "~> 9.1.0"},
+      {:sentry, "~> 10.0.1"},
       {:rexbug, "~> 1.0"}
     ]
   end
