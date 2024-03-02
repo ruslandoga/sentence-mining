@@ -7,7 +7,7 @@ on:
 
 jobs:
   mix:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     env:
       MIX_ENV: test
@@ -25,9 +25,10 @@ jobs:
           path: |
             deps
             _build
-
-          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ runner.os }}-mix-
+          key: test-${{ matrix.otp }}-${{ matrix.elixir }}-${{ github.head_ref || github.ref }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            test-${{ matrix.otp }}-${{ matrix.elixir }}-${{ github.head_ref || github.ref }}-
+            test-${{ matrix.otp }}-${{ matrix.elixir }}-refs/heads/master-
 
       - run: mix deps.get
       - run: mix format --check-formatted
