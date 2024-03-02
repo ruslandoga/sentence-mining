@@ -66,7 +66,6 @@ defmodule M.MixProject do
       jmdict: ["cmd bin/jmdict.sh"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      sentry_recompile: ["compile", "deps.compile sentry --force"],
       "assets.deploy": [
         "cmd npm ci --prefix assets",
         "cmd npm run deploy:css --prefix assets",

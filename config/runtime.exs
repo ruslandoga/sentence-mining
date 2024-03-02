@@ -10,8 +10,7 @@ import Config
 config :logger, :console, format: "$time [$level] $message\n"
 
 config :sentry,
-  environment_name: config_env(),
-  included_environments: [:prod]
+  environment_name: config_env()
 
 jmdict_db_path =
   System.get_env("JMDICT_DB_PATH") || Path.expand("../jmdict.db", Path.dirname(__ENV__.file))

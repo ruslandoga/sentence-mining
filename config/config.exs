@@ -14,10 +14,9 @@ config :logger, :console,
 
 config :phoenix, :json_library, Jason
 
-config :sentry, client: M.Sentry.FinchHTTPClient
-
 config :sentry,
   enable_source_code_context: true,
-  root_source_code_paths: [File.cwd!()]
+  root_source_code_paths: [File.cwd!()],
+  client: M.Sentry.FinchHTTPClient
 
 import_config "#{config_env()}.exs"
