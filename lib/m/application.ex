@@ -8,7 +8,7 @@ defmodule M.Application do
     jmdict_repo_config = Application.fetch_env!(:m, M.JMDictRepo)
 
     children = [
-      {Finch, name: M.Finch, pools: %{"https://api.telegram.org" => [protocol: :http2]}},
+      {Finch, name: M.Finch, pools: finch_pools()},
       M.Repo,
       if database = jmdict_repo_config[:database] do
         if File.exists?(database) do
@@ -31,5 +31,16 @@ defmodule M.Application do
   def config_change(changed, _new, removed) do
     MWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp finch_pools do
+    pools = %{"https://api.telegram.org" => [protocol: :http2]}
+
+    if sentry_dns = Application.get_env(:sentry, :dsn) do
+      %URI{host: host} = URI.parse(sentry_dns)
+      Map.put(pools, host, protocol: :http2)
+    else
+      pools
+    end
   end
 end
