@@ -80,7 +80,9 @@ defmodule MWeb do
 
   defp view_helpers do
     quote do
-      use Phoenix.HTML
+      import Phoenix.HTML
+      import Phoenix.HTML.Form
+      use PhoenixHTMLHelpers
       import Phoenix.{Component, View}
       import MWeb.ErrorHelpers
       alias MWeb.Router.Helpers, as: Routes
