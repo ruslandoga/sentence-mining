@@ -8,10 +8,11 @@ defmodule MWeb.Endpoint do
   @session_options [
     store: :cookie,
     key: "_w_key",
-    signing_salt: "qH39K17q"
+    signing_salt: "qH39K17q",
+    same_site: "Lax"
   ]
 
-  socket("/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]])
+  socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -21,20 +22,16 @@ defmodule MWeb.Endpoint do
     at: "/",
     from: :m,
     gzip: true,
-    only: ~w(assets fonts images favicon.ico robots.txt)
+    only: MWeb.static_paths()
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
   if code_reloading? do
-    socket("/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket)
+    socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
     plug Phoenix.LiveReloader
     plug Phoenix.CodeReloader
     plug Phoenix.Ecto.CheckRepoStatus, otp_app: :m
   end
-
-  # plug Phoenix.LiveDashboard.RequestLogger,
-  #   param_key: "request_logger",
-  #   cookie_key: "request_logger"
 
   plug :health
 

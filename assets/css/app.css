@@ -1,3 +1,4 @@
-@import "./tailwind.css";
-@import "./phoenix.css";
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 @import "../node_modules/tippy.js/dist/tippy.css";

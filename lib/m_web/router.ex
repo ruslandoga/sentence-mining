@@ -5,7 +5,7 @@ defmodule MWeb.Router do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_live_flash
-    plug :put_root_layout, {MWeb.LayoutView, :root}
+    plug :put_root_layout, html: {MWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
   end
@@ -15,7 +15,7 @@ defmodule MWeb.Router do
   end
 
   scope "/", MWeb do
-    pipe_through(:browser)
+    pipe_through :browser
 
     live "/", KanjiLive, :index
     live "/:word", KanjiLive, :word

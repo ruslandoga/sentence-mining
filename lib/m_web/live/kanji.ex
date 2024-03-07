@@ -12,27 +12,19 @@ defmodule MWeb.KanjiLive do
     <div class="p-4 max-w-screen-xl mx-auto">
       <div class="text-3xl text-center">
         <%= @word %>
-        <%= if @word_info do %>
-          <span class="text-gray-400">(<%= @word_info.reading %>)</span>
-        <% end %>
+        <span :if={@word_info} class="text-gray-400">(<%= @word_info.reading %>)</span>
       </div>
 
-      <%= if @word_info do %>
-        <div class="mt-2 flex space-x-4 justify-center text-gray-400">
-          <div class="text-green-600 dark:text-green-300"><%= @word_info.meaning %></div>
-        </div>
-      <% end %>
+      <div :if={@word_info} class="mt-2 flex space-x-4 justify-center text-gray-400">
+        <div class="text-green-600 dark:text-green-300"><%= @word_info.meaning %></div>
+      </div>
 
       <div class="mt-4 flex -mx-2 flex-wrap justify-center">
-        <%= for kanji <- @kanjis do %>
-          <.kanji_card kanji={kanji} />
-        <% end %>
+        <.kanji_card :for={kanji <- @kanjis} kanji={kanji} />
       </div>
 
       <div class="mt-4 flex -mx-2 flex-wrap">
-        <%= for word <- @words do %>
-          <.word_card word={word} />
-        <% end %>
+        <.word_card :for={word <- @words} word={word} />
       </div>
     </div>
     """
@@ -54,19 +46,15 @@ defmodule MWeb.KanjiLive do
         <h3 class="flex items-center justify-between">
           <span class="text-2xl"><%= @kanji.kanji %></span>
           <div class="ml-4 text-sm text-gray-400 text-right">
-            <%= if @jlpt do %>
-              <div><%= @jlpt %></div>
-            <% end %>
-            <%= if @kanji.frequency do %>
-              <div>freq:<%= @kanji.frequency %></div>
-            <% end %>
+            <div :if={@jlpt}><%= @jlpt %></div>
+            <div :if={@kanji.frequency}>freq:<%= @kanji.frequency %></div>
           </div>
         </h3>
 
         <dl class="mt-2">
           <.info_point title="radical" color="text-green-600 dark:text-green-300">
             <.link
-              navigate={kanji_path(:radical, @kanji.radical)}
+              navigate={~p"/radical/#{@kanji.radical}"}
               class="hover:underline underline-offset-2 decoration-2"
             >
               <%= @kanji.radical %>
@@ -76,55 +64,56 @@ defmodule MWeb.KanjiLive do
             </.link>
           </.info_point>
 
-          <%= if @kanji.phonetic do %>
-            <.info_point title="phonetic" color="text-sky-600 dark:text-sky-300">
-              <.link
-                href={kanji_path(:phonetic, @kanji.phonetic)}
-                class="hover:underline underline-offset-2 decoration-2"
-              >
-                <%= @kanji.phonetic %>
-              </.link>
-            </.info_point>
-          <% end %>
+          <.info_point :if={@kanji.phonetic} title="phonetic" color="text-sky-600 dark:text-sky-300">
+            <.link
+              href={~p"/phonetic/#{@kanji.phonetic}"}
+              class="hover:underline underline-offset-2 decoration-2"
+            >
+              <%= @kanji.phonetic %>
+            </.link>
+          </.info_point>
 
-          <%= if @kanji.reg_on && @kanji.reg_on != [] do %>
-            <.info_point title="on" color="text-yellow-600 dark:text-yellow-300">
-              <%= for on <- @kanji.reg_on do %>
-                <.link
-                  navigate={kanji_path(:on, trim_on(on))}
-                  class="hover:underline underline-offset-2 decoration-2"
-                >
-                  <%= on %>
-                </.link>
-              <% end %>
-            </.info_point>
-          <% end %>
+          <.info_point
+            :if={@kanji.reg_on && @kanji.reg_on != []}
+            title="on"
+            color="text-yellow-600 dark:text-yellow-300"
+          >
+            <.link
+              :for={on <- @kanji.reg_on}
+              navigate={~p"/on/#{trim_on(on)}"}
+              class="hover:underline underline-offset-2 decoration-2"
+            >
+              <%= on %>
+            </.link>
+          </.info_point>
 
-          <%= if @kanji.reg_kun && @kanji.reg_kun != [] do %>
-            <.info_point title="kun" color="text-red-600 dark:text-red-300">
-              <%= for kun <- @kanji.reg_kun do %>
-                <.link
-                  navigate={kanji_path(:kun, trim_on(trim_kun(kun)))}
-                  class="hover:underline underline-offset-2 decoration-2"
-                >
-                  <%= kun %>
-                </.link>
-              <% end %>
-            </.info_point>
-          <% end %>
+          <.info_point
+            :if={@kanji.reg_kun && @kanji.reg_kun != []}
+            title="kun"
+            color="text-red-600 dark:text-red-300"
+          >
+            <.link
+              :for={kun <- @kanji.reg_kun}
+              navigate={~p"/kun/#{trim_on(trim_kun(kun))}"}
+              class="hover:underline underline-offset-2 decoration-2"
+            >
+              <%= kun %>
+            </.link>
+          </.info_point>
 
-          <%= if @meaning && @meaning != [] do %>
-            <.info_point title="meanings" color="text-green-600 dark:text-green-300">
-              <%= for meaning <- @meaning do %>
-                <.link
-                  navigate={kanji_path(:meaning, meaning)}
-                  class="hover:underline underline-offset-2 decoration-2"
-                >
-                  <%= meaning %>
-                </.link>
-              <% end %>
-            </.info_point>
-          <% end %>
+          <.info_point
+            :if={@meaning && @meaning != []}
+            title="meanings"
+            color="text-green-600 dark:text-green-300"
+          >
+            <.link
+              :for={meaning <- @meaning}
+              navigate={~p"/meaning/#{meaning}"}
+              class="hover:underline underline-offset-2 decoration-2"
+            >
+              <%= meaning %>
+            </.link>
+          </.info_point>
         </dl>
       </div>
     </div>
@@ -137,7 +126,7 @@ defmodule MWeb.KanjiLive do
       <div class="p-4 bg-gray-50 border border-gray-200 dark:border-none dark:bg-zinc-700 rounded h-full">
         <h3 class="flex items-center justify-between">
           <.link
-            navigate={kanji_path(:word, @word.expression)}
+            navigate={~p"/#{@word.expression}"}
             class="text-2xl hover:underline underline-offset-4 decoration-2"
           >
             <%= @word.expression %>
@@ -161,13 +150,9 @@ defmodule MWeb.KanjiLive do
     ~H"""
     <div>
       <dt class="inline text-sm text-gray-500 dark:text-gray-300"><%= @title %>:</dt>
-      <dd class={@color <> " inline"}><%= render_slot(@inner_block) %></dd>
+      <dd class={[@color, "inline"]}><%= render_slot(@inner_block) %></dd>
     </div>
     """
-  end
-
-  defp kanji_path(action, value) do
-    Routes.kanji_path(MWeb.Endpoint, action, value)
   end
 
   alias M.Kanjis

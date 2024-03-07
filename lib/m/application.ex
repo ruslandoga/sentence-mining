@@ -34,11 +34,11 @@ defmodule M.Application do
   end
 
   defp finch_pools do
-    pools = %{"https://api.telegram.org" => [protocol: :http2]}
+    pools = %{"https://api.telegram.org" => [protocols: [:http2]]}
 
     if sentry_dns = Application.get_env(:sentry, :dsn) do
       %URI{host: host} = URI.parse(sentry_dns)
-      Map.put(pools, host, protocol: :http2)
+      Map.put(pools, host, protocols: [:http2])
     else
       pools
     end

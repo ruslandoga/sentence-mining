@@ -24,8 +24,6 @@ defmodule MWeb.ConnCase do
       import Phoenix.ConnTest
       import MWeb.ConnCase
 
-      alias MWeb.Router.Helpers, as: Routes
-
       # The default endpoint for testing
       @endpoint MWeb.Endpoint
     end

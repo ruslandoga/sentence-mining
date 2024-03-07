@@ -12,9 +12,7 @@ defmodule MWeb.SentenceLive do
     ~H"""
     <div class="min-h-screen lg:flex lg:items-center lg:justify-center">
       <div class="text-2xl p-6 flex max-w-screen-xl mx-auto">
-        <%= for {segment, idx} <- Enum.with_index(@segments) do %>
-          <.segment id={idx} segment={segment} />
-        <% end %>
+        <.segment :for={{segment, idx} <- Enum.with_index(@segments)} id={idx} segment={segment} />
       </div>
     </div>
     """
@@ -40,17 +38,15 @@ defmodule MWeb.SentenceLive do
     ~H"""
     <span
       id={"segment-#{@id}"}
-      class={"px-0.5 " <> @segment_class}
+      class={["px-0.5", @segment_class]}
       data-template={"tippy-#{@id}"}
       phx-hook="TippyHook"
     >
       <%= @surface_form %>
     </span>
-    <%= if @part_of_speech && @entry do %>
-      <template id={"tippy-#{@id}"}>
-        <.tippy_content part_of_speech={@part_of_speech} lexical_form={@lexical_form} entry={@entry} />
-      </template>
-    <% end %>
+    <template :if={@part_of_speech && @entry} id={"tippy-#{@id}"}>
+      <.tippy_content part_of_speech={@part_of_speech} lexical_form={@lexical_form} entry={@entry} />
+    </template>
     """
   end
 
@@ -69,9 +65,7 @@ defmodule MWeb.SentenceLive do
         <% end %>
       </div>
       <div class="p-1 pt-0">
-        <%= for subentry <- @entry do %>
-          <.entry_content entry={subentry} />
-        <% end %>
+        <.entry_content :for={subentry <- @entry} entry={subentry} />
       </div>
     </div>
     """
@@ -100,13 +94,11 @@ defmodule MWeb.SentenceLive do
 
     ~H"""
     <ul class="list-disc px-4">
-      <%= for meanings <- @meanings do %>
-        <li>
-          <%= for meaning <- Enum.intersperse(meanings, "; ") do %>
-            <%= meaning %>
-          <% end %>
-        </li>
-      <% end %>
+      <li :for={meanings <- @meanings}>
+        <%= for meaning <- Enum.intersperse(meanings, "; ") do %>
+          <%= meaning %>
+        <% end %>
+      </li>
     </ul>
     """
   end
