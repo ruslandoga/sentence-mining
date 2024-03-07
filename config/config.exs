@@ -4,7 +4,10 @@ config :m, ecto_repos: [M.Repo]
 
 config :m, MWeb.Endpoint,
   url: [host: "localhost"],
-  render_errors: [view: MWeb.ErrorView, accepts: ~w(html json), layout: false],
+  render_errors: [
+    formats: [html: MWeb.ErrorHTML, json: MWeb.ErrorJSON],
+    layout: false
+  ],
   pubsub_server: M.PubSub,
   live_view: [signing_salt: "yePNywHX"]
 
