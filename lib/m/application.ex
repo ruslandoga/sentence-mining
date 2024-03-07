@@ -37,8 +37,8 @@ defmodule M.Application do
     pools = %{"https://api.telegram.org" => [protocols: [:http2]]}
 
     if sentry_dns = Application.get_env(:sentry, :dsn) do
-      %URI{host: host} = URI.parse(sentry_dns)
-      Map.put(pools, host, protocols: [:http2])
+      %URI{scheme: scheme, host: host} = URI.parse(sentry_dns)
+      Map.put(pools, scheme <> "://" <> host, protocols: [:http2])
     else
       pools
     end
