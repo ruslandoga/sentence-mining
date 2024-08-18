@@ -37,7 +37,7 @@ defmodule M.MixProject do
       {:phoenix, "~> 1.7.2"},
       {:phoenix_ecto, "~> 4.4"},
       {:ecto_sql, "~> 3.6"},
-      {:ecto_sqlite3, "~> 0.16.0"},
+      {:ecto_sqlite3, "~> 0.17.0"},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_view, "~> 2.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
