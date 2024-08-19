@@ -5,7 +5,6 @@ config :m, M.Bot, adapter: M.Bot.API
 config :phoenix, :plug_init_mode, :runtime
 
 config :m, M.Repo,
-  database: Path.expand("../m_test.db", Path.dirname(__ENV__.file)),
   pool_size: 5,
   pool: Ecto.Adapters.SQL.Sandbox,
   stacktrace: true,

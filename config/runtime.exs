@@ -80,10 +80,7 @@ if config_env() == :dev do
   config :logger, :console, format: "[$level] $message\n"
   config :m, M.Bot, token: System.fetch_env!("TG_BOT_KEY")
   config :m, MWeb.Endpoint, http: [ip: {127, 0, 0, 1}, port: 4000]
-
-  config :m, M.Repo,
-    database: Path.expand("../m_dev.db", Path.dirname(__ENV__.file)),
-    show_sensitive_data_on_connection_error: true
+  config :m, M.Repo, database: Path.expand("../m_dev.db", Path.dirname(__ENV__.file))
 end
 
 if config_env() == :test do
